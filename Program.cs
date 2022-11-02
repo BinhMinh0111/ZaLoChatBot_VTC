@@ -1,4 +1,5 @@
 global using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Options;
 
 
@@ -11,6 +12,7 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 var app = builder.Build();
 

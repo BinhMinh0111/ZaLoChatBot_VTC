@@ -1,77 +1,71 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Serilog;
 using System.Data;
 using ZaloOA_v2.Helpers;
 using ZaloOA_v2.Models;
+using Microsoft.Extensions.Configuration;
+using System.Configuration;
+using System.Diagnostics;
 
 namespace ZaloOA_v2.Controllers
 {
     public class EventController : Controller
     {
-        public void run(string json)
+        public void Run(string json)
         {
             //Read and process events
             var eventHolder = EventHelper.Events(json);
             if (eventHolder.event_name == "user_send_text" || eventHolder.event_name == "user_send_image")
             {
-                db_a8ebff_kenjenorContext context = new db_a8ebff_kenjenorContext();
-
                 if (eventHolder.event_name == "user_send_text")
                 {
-                    Console.WriteLine("event_name: " + eventHolder.event_name);
-                    TextProcess(context, json);
+                   TextProcess(json);
                 }
                 else
                 {
-                    Console.WriteLine("event_name: " + eventHolder.event_name);
-                    PictureProcess(context, json);
+                   PictureProcess(json);
                 }
             }
             else
             {
                 //ghi log even + timestamp
-                Console.WriteLine("Event unknow");
-            }
+                LogWriter log = new LogWriter("New event: " + eventHolder.event_name);
+            }            
         }
-        public void TextProcess(db_a8ebff_kenjenorContext db, string json)
+        public void TextProcess(string json)
         {
             var textHolder = EventHelper.Text(json);
             long user_id = long.Parse(textHolder.id);
-            Console.WriteLine("user_id: " + user_id);
             if (UserExist(user_id))
             {
-                Console.WriteLine("Exist");
-                AddText(json, db);
+                AddText(json);
             }
             else
             {
-                Console.WriteLine("Non exist");
-                AddNewUser(user_id, db);
-                AddText(json, db);
+                AddNewUser(user_id);
+                AddText(json);
             }
         }
-        public void PictureProcess(db_a8ebff_kenjenorContext db, string json)
+        public async Task PictureProcess(string json)
         {
             var picHolder = EventHelper.Picture(json);
             long user_id = long.Parse(picHolder.id);
-            Console.WriteLine("user_id: " + user_id);
             if (UserExist(user_id))
             {
-                Console.WriteLine("Exist");
-                AddPicture(json, db);
+                AddPicture(json);
             }
             else
             {
-                Console.WriteLine("Non exist");
-                AddNewUser(user_id, db);
-                AddPicture(json, db);
+                AddNewUser(user_id);
+                AddPicture(json);
             }
         }
 
         public Boolean UserExist(long user_id)
         {
             //Check DB if user exist
-            string conn = @"Data Source=SQL8003.site4now.net;Initial Catalog=db_a8ebff_kenjenor;User Id=db_a8ebff_kenjenor_admin;Password=Minh@258369";
+            string conn = ConfigHelper.ConnString("DefaultConnection");
             SqlConnection sqlCon = null;
             if (sqlCon == null)
                 sqlCon = new SqlConnection(conn);
@@ -94,14 +88,15 @@ namespace ZaloOA_v2.Controllers
             }
             catch (SqlException ex)
             {
-                Console.WriteLine(ex);
+                LogWriter log = new LogWriter(ex.Message);
             }
             return false;
         }
-        public void AddNewUser(long user_id, db_a8ebff_kenjenorContext db)
+        public void AddNewUser(long user_id)
         {
+            db_a8ebff_kenjenorContext context = new db_a8ebff_kenjenorContext();
             var userholder = EventHelper.Users(user_id);
-            using (db)
+            using (context)
             {
                 var zaloUser = new ZaloUser
                 {
@@ -112,19 +107,15 @@ namespace ZaloOA_v2.Controllers
                     Avatar = userholder.avatar,
                     UserState = true
                 };
-                Console.WriteLine("done parse");
-                db.ZaloUsers.Add(zaloUser);
-                Console.WriteLine("done add");
-                db.SaveChanges();
-                Console.WriteLine("done db");
+                context.ZaloUsers.Add(zaloUser);
+                context.SaveChanges();
             }
-            Console.WriteLine("done user");
         }
-        public void AddText(string json, db_a8ebff_kenjenorContext db)
+        public void AddText(string json)
         {
-            Console.WriteLine("Add Text");
+            db_a8ebff_kenjenorContext context = new db_a8ebff_kenjenorContext();
             var textHolder = EventHelper.Text(json);
-            using (db)
+            using (context)
             {
                 var zaloFeedback = new ZaloFeedback
                 {
@@ -132,14 +123,29 @@ namespace ZaloOA_v2.Controllers
                     Feedbacks = textHolder.text,
                     Timestamp = long.Parse(textHolder.timeStamp)
                 };
-                db.ZaloFeedbacks.Add(zaloFeedback);
-                db.SaveChanges();
+                context.ZaloFeedbacks.Add(zaloFeedback);
+                context.SaveChanges();
             }
-            Console.WriteLine("done text");
+            Console.WriteLine("Move to mess process");
+            try
+            {
+                var cancelToken = new CancellationTokenSource(20000).Token;
+                Task.Run(async () =>
+                {
+                    ReplyController reply = new ReplyController();
+                    reply.MessagesProcess(long.Parse(textHolder.id), textHolder.text);
+                    cancelToken.ThrowIfCancellationRequested();
+                }, cancelToken);
+            }
+            catch (Exception ex)
+            {
+                LogWriter logWriter = new LogWriter(ex.Message);
+                Console.WriteLine("Too long!");
+            }
         }
-        public void AddPicture(string json, db_a8ebff_kenjenorContext db)
+        public void AddPicture(string json)
         {
-            Console.WriteLine("Add Pics");
+            db_a8ebff_kenjenorContext context = new db_a8ebff_kenjenorContext();
             var pictureHolder = EventHelper.Picture(json);
             List<ZaloPicture> pictureList = new List<ZaloPicture>();
             foreach (string item in pictureHolder.url)
@@ -147,8 +153,7 @@ namespace ZaloOA_v2.Controllers
                 pictureList.Add(new ZaloPicture()
                 { UserId = long.Parse(pictureHolder.id), PicUrl = item, Timestamp = long.Parse(pictureHolder.timeStamp) });
             }
-            Console.WriteLine("done pic list");
-            using (db)
+            using (context)
             {
                 foreach (ZaloPicture picture in pictureList)
                 {
@@ -158,14 +163,10 @@ namespace ZaloOA_v2.Controllers
                         PicUrl = picture.PicUrl,
                         Timestamp = picture.Timestamp
                     };
-                    Console.WriteLine("done parse");
-                    db.ZaloPictures.Add(zaloPicture);
-                    Console.WriteLine("done add " + picture.PicUrl);
+                    context.ZaloPictures.Add(zaloPicture);
                 }
-                db.SaveChanges();
-                Console.WriteLine("done db");
+                context.SaveChanges();
             }
-            Console.WriteLine("done pics");
         }
     }
 }

@@ -15,22 +15,27 @@ namespace ZaloOA_v2.API
         public string json = string.Empty;
 
         [HttpPost("/listen")]
-        public async Task Listen()
+        public async Task<HttpResponseMessage> Listen()
         {
             HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-            Return200(result);
-
             using (var reader = new StreamReader(Request.Body))
             {
                 json = await reader.ReadToEndAsync();
             }
-            Console.WriteLine(json);
-            EventController eventController = new EventController();
-            eventController.run(json);
-        }
-        [HttpPost]
-        public async Task<HttpResponseMessage> Return200(HttpResponseMessage result)
-        {
+            try
+            {
+                var cancelToken = new CancellationTokenSource(40000).Token;
+                Task.Run(async () =>
+                {
+                    EventController eventController = new EventController();
+                    eventController.Run(json);
+                    cancelToken.ThrowIfCancellationRequested();
+                }, cancelToken);
+            }
+            catch (Exception ex)
+            {
+                LogWriter logWriter = new LogWriter(ex.Message);
+            }           
             return result;
         }
     }

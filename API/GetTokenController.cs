@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RestSharp;
+using Serilog;
 
 namespace ZaloOA_v2.API
 {
@@ -19,7 +20,7 @@ namespace ZaloOA_v2.API
             request.AddParameter("refresh_token", refresh);
             request.AddParameter("app_id", "4517810202964705506");
             request.AddParameter("grant_type", "refresh_token");
-            RestResponse response = client.Execute(request);
+            RestResponse response = client.Execute(request);          
             return response.Content;
         }
     }

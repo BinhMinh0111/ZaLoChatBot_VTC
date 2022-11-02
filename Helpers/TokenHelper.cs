@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Serilog;
 using ZaloOA_v2.API;
 namespace ZaloOA_v2.Helpers
 {
@@ -14,7 +15,7 @@ namespace ZaloOA_v2.Helpers
         public static string GetToken()
         {
             Token token = new Token();
-            string filePath = @"E:\ZaloOA_v2\ZaloOA_v2\Data\Token.txt";       
+            string filePath = Path.GetFullPath("Data\\Token.txt");
             string[] lines = GetAll(filePath);
 
             //Check if access token is still valid
@@ -58,12 +59,12 @@ namespace ZaloOA_v2.Helpers
                     while ((line = sr.ReadLine()) != null)
                     {
                         list.Add(line);
+                        Log.Information("token: "+line);
                     }
                 }
             }
             catch (IOException e)
             {
-                Console.WriteLine("The file could not be read:");
                 Console.WriteLine(e.Message);
             }
             //List to array and trim blanks
@@ -73,7 +74,7 @@ namespace ZaloOA_v2.Helpers
         }
         //Write token package into file
         public static void Write(string filePath, string token, string refresh)
-        {
+        {           
             string timeStamp = DateTime.Now.ToString();
             string[] lines = { token, refresh, timeStamp };
             using (StreamWriter streamWriter = new StreamWriter(path: filePath))
@@ -81,6 +82,7 @@ namespace ZaloOA_v2.Helpers
                 foreach (string line in lines)
                 {
                     streamWriter.WriteLine(line);
+                    LogWriter log = new LogWriter(line);                    
                 }
             }
         }

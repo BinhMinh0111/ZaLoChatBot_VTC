@@ -46,7 +46,7 @@ namespace ZaloOA_v2.Helpers
             }
             catch (WebException e)
             {
-                //logger.Error(e);
+                LogWriter.LogWrite(e.Response.ToString());
                 statusCode = HttpStatusCode.NotFound;
                 using (WebResponse response = e.Response)
                 {
@@ -60,11 +60,11 @@ namespace ZaloOA_v2.Helpers
                         }
                     }
                 }
-                //logger.Error(responseData);
+                LogWriter.LogWrite(responseData);
             }
             catch (Exception ex)
             {
-                //logger.Error(ex);
+                LogWriter.LogWrite(ex.Message);
                 statusCode = HttpStatusCode.NotFound;
             }
 

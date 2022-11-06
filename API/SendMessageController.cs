@@ -34,8 +34,33 @@ namespace ZaloOA_v2.API
             }
             catch (Exception ex)
             {
-                LogWriter log = new LogWriter(ex.Message);
+                LogWriter.LogWrite(ex.Message);
             }           
+        }
+        //Get messages of specific user
+        //ID cuar Binh Minh: 2560249990295819088;
+        //ID của OA: 3365848085546568135
+        public string follower_messages;
+        [HttpGet("/messages/user")]
+        public async Task<string> GetMessageFromUser(long user_id, int offset, int count)
+        {
+            string method = "GET";
+            var url = $"https://openapi.zalo.me/v2.0/oa/conversation?data={JsonHelper.Serialize(new { user_id, offset, count })}";
+            string aToken = TokenHelper.GetToken();
+            HttpStatusCode StatusCode;
+            follower_messages = HttpHelper.CallAuthJson(url, null, null, aToken, out StatusCode, method, 120000, "access_token");
+            return follower_messages;
+        }
+
+        [HttpGet("/conversation")]
+        public async Task<string> GetConversation(int offset, int count)
+        {
+            string method = "GET";
+            var url = $"https://openapi.zalo.me/v2.0/oa/listrecentchat?data={JsonHelper.Serialize(new { offset, count })}";
+            string aToken = TokenHelper.GetToken();
+            HttpStatusCode StatusCode;
+            follower_messages = HttpHelper.CallAuthJson(url, null, null, aToken, out StatusCode, method, 120000, "access_token");
+            return follower_messages;
         }
     }
 }

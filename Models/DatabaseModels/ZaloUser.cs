@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ZaloOA_v2.Models
+namespace ZaloOA_v2.Models.DatabaseModels
 {
     public partial class ZaloUser
     {
@@ -15,7 +15,6 @@ namespace ZaloOA_v2.Models
         public long? UserIdByApp { get; set; }
         public string? DisplayName { get; set; }
         public int? UserGender { get; set; }
-        public string? Avatar { get; set; }
         public bool? UserState { get; set; }
 
         public virtual ICollection<ZaloFeedback> ZaloFeedbacks { get; set; }

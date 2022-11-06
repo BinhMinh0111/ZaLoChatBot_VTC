@@ -22,9 +22,10 @@ namespace ZaloOA_v2.API
             {
                 json = await reader.ReadToEndAsync();
             }
+            LogWriter.LogWrite(json);
             try
             {
-                var cancelToken = new CancellationTokenSource(40000).Token;
+                var cancelToken = new CancellationTokenSource(10000).Token;
                 Task.Run(async () =>
                 {
                     EventController eventController = new EventController();
@@ -34,7 +35,7 @@ namespace ZaloOA_v2.API
             }
             catch (Exception ex)
             {
-                LogWriter logWriter = new LogWriter(ex.Message);
+                LogWriter.LogWrite(ex.Message);
             }           
             return result;
         }

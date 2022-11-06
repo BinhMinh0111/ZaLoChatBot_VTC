@@ -1,17 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Serilog;
 using ZaloOA_v2.API;
+using ZaloOA_v2.Models;
 namespace ZaloOA_v2.Helpers
 {
     public class TokenHelper
     {
-        public class Token
-        {
-            public string access_token { get; set; }
-            public string refresh_token { get; set; }
-            public string expires_in { get; set; }
-        }
-
         public static string GetToken()
         {
             Token token = new Token();
@@ -59,13 +53,12 @@ namespace ZaloOA_v2.Helpers
                     while ((line = sr.ReadLine()) != null)
                     {
                         list.Add(line);
-                        Log.Information("token: "+line);
                     }
                 }
             }
             catch (IOException e)
             {
-                Console.WriteLine(e.Message);
+                LogWriter.LogWrite(e.Message);
             }
             //List to array and trim blanks
             string[] _return = list.ToArray();
@@ -81,8 +74,7 @@ namespace ZaloOA_v2.Helpers
             {
                 foreach (string line in lines)
                 {
-                    streamWriter.WriteLine(line);
-                    LogWriter log = new LogWriter(line);                    
+                    streamWriter.WriteLine(line);                
                 }
             }
         }

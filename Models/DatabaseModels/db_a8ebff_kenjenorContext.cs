@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace ZaloOA_v2.Models
+namespace ZaloOA_v2.Models.DatabaseModels
 {
     public partial class db_a8ebff_kenjenorContext : DbContext
     {

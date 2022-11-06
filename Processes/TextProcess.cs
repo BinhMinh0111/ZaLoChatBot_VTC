@@ -1,7 +1,7 @@
 ﻿using ZaloOA_v2.Controllers;
 using ZaloOA_v2.Helpers;
 
-namespace ZaloOA_v2.Models.Logic
+namespace ZaloOA_v2.Processes
 {
     public class TextProcess
     {
@@ -25,15 +25,15 @@ namespace ZaloOA_v2.Models.Logic
         public void IsRequest(string json)
         {
             var textHolder = DataHelper.UserText(json);
-            if(textHolder.text == "#upload")
+            if (textHolder.text == "#upload")
             {
-                KeyValuePair<string,string> requestUser = new KeyValuePair<string,string>(textHolder.id,DateTime.Now.ToString());
+                KeyValuePair<string, string> requestUser = new KeyValuePair<string, string>(textHolder.id, DateTime.Now.ToString());
                 //Check in file if exist user then delete else write to file
-            }   
+            }
             else
             {
                 LogWriter.LogWrite(string.Format("user ID: {0} \n Message: {1}", textHolder.id, textHolder.text));
-            }    
+            }
         }
         public static void Reply(long userId, string text)
         {

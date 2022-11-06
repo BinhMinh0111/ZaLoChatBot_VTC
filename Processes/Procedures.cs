@@ -3,11 +3,11 @@ using System.Data.SqlClient;
 using ZaloOA_v2.Helpers;
 using ZaloOA_v2.Models.DatabaseModels;
 
-namespace ZaloOA_v2.Models.Logic
+namespace ZaloOA_v2.Processes
 {
     public class Procedures
     {
-        public Boolean UserExist(long user_id)
+        public bool UserExist(long user_id)
         {
             //Check DB if user exist
             string conn = ConfigHelper.ConnString("DefaultConnection");

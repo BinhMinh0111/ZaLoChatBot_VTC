@@ -3,7 +3,7 @@ using ZaloOA_v2.Controllers;
 using ZaloOA_v2.Helpers;
 using ZaloOA_v2.Models.DatabaseModels;
 
-namespace ZaloOA_v2.Models.Logic
+namespace ZaloOA_v2.Processes
 {
     public class DbProcess
     {
@@ -36,7 +36,7 @@ namespace ZaloOA_v2.Models.Logic
         {
             db_a8ebff_kenjenorContext context = new db_a8ebff_kenjenorContext();
             var textHolder = DataHelper.UserText(json);
-            try 
+            try
             {
                 using (context)
                 {
@@ -50,10 +50,10 @@ namespace ZaloOA_v2.Models.Logic
                     context.SaveChanges();
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 LogWriter.LogWrite(ex.Message);
-            }            
+            }
         }
         public static void AddPicture(string json)
         {

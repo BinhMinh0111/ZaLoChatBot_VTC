@@ -86,11 +86,6 @@ namespace ZaloOA_v2.Models.DatabaseModels
                     .ValueGeneratedNever()
                     .HasColumnName("user_id");
 
-                entity.Property(e => e.Avatar)
-                    .HasMaxLength(100)
-                    .IsUnicode(false)
-                    .HasColumnName("avatar");
-
                 entity.Property(e => e.DisplayName)
                     .HasMaxLength(50)
                     .HasColumnName("display_name");

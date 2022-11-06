@@ -1,6 +1,6 @@
 ﻿using ZaloOA_v2.Helpers;
 
-namespace ZaloOA_v2.Models.Logic
+namespace ZaloOA_v2.Processes
 {
     public class PictureProcess
     {

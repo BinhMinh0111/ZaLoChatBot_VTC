@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using System.Configuration;
 using System.Diagnostics;
 using ZaloOA_v2.Models.DatabaseModels;
-using ZaloOA_v2.Models.Logic;
+using ZaloOA_v2.Processes;
 
 namespace ZaloOA_v2.Controllers
 {

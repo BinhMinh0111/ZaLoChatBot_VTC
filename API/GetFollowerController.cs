@@ -16,7 +16,7 @@ namespace ZaloOA_v2.API
         {
             string method = "GET";
             var url = $"https://openapi.zalo.me/v2.0/oa/getprofile?data={JsonHelper.Serialize(new { user_id })}";
-            string aToken = TokenHelper.GetToken();
+            string aToken = DataHelper.GetToken();
             HttpStatusCode StatusCode;
             follower_details = HttpHelper.CallAuthJson(url, null, null, aToken,
                 out StatusCode, method, 120000, "access_token");

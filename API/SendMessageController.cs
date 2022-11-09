@@ -11,13 +11,13 @@ namespace ZaloOA_v2.API
     public class SendMessageController : ControllerBase
     {
         [HttpPost]
-        public async Task SendMessageToUser(long user_id, string text)
+        public Task SendMessageToUser(long user_id, string text)
         {
             try 
             {
                 string method = "POST";
                 var url = "https://openapi.zalo.me/v2.0/oa/message";
-                string aToken = TokenHelper.GetToken();
+                string aToken = DataHelper.GetToken();
                 var data = new
                 {
                     recipient = new Messages.Recipient
@@ -31,12 +31,15 @@ namespace ZaloOA_v2.API
                 };
                 HttpStatusCode StatusCode;
                 HttpHelper.CallAuthJson(url, null, data, aToken, out StatusCode, method, 120000, "access_token");
+                return Task.CompletedTask;
             }
             catch (Exception ex)
             {
                 LogWriter.LogWrite(ex.Message);
-            }           
+                return Task.CompletedTask;
+            }    
         }
+
         //Get messages of specific user
         //ID cuar Binh Minh: 2560249990295819088;
         //ID của OA: 3365848085546568135
@@ -46,7 +49,7 @@ namespace ZaloOA_v2.API
         {
             string method = "GET";
             var url = $"https://openapi.zalo.me/v2.0/oa/conversation?data={JsonHelper.Serialize(new { user_id, offset, count })}";
-            string aToken = TokenHelper.GetToken();
+            string aToken = DataHelper.GetToken();
             HttpStatusCode StatusCode;
             follower_messages = HttpHelper.CallAuthJson(url, null, null, aToken, out StatusCode, method, 120000, "access_token");
             return follower_messages;
@@ -57,7 +60,7 @@ namespace ZaloOA_v2.API
         {
             string method = "GET";
             var url = $"https://openapi.zalo.me/v2.0/oa/listrecentchat?data={JsonHelper.Serialize(new { offset, count })}";
-            string aToken = TokenHelper.GetToken();
+            string aToken = DataHelper.GetToken();
             HttpStatusCode StatusCode;
             follower_messages = HttpHelper.CallAuthJson(url, null, null, aToken, out StatusCode, method, 120000, "access_token");
             return follower_messages;

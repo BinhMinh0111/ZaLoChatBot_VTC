@@ -25,8 +25,8 @@ namespace ZaloOA_v2.API
             LogWriter.LogWrite(json);
             try
             {
-                var cancelToken = new CancellationTokenSource(10000).Token;
-                Task.Run(async () =>
+                var cancelToken = new CancellationTokenSource(20000).Token;
+                Task.Run(() =>
                 {
                     EventController eventController = new EventController();
                     eventController.Run(json);

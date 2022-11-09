@@ -44,7 +44,7 @@ namespace ZaloOA_v2.Processes
             {
                 try
                 {
-                    var users = context.ZaloUsers;
+                    var users = context.OaUsers;
                     foreach (var user in users)
                     {
                         if (userId == user.UserId)

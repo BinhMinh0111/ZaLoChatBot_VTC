@@ -16,9 +16,11 @@ namespace ZaloOA_v2.Models.DatabaseModels
         {
         }
 
-        public virtual DbSet<ZaloFeedback> ZaloFeedbacks { get; set; } = null!;
-        public virtual DbSet<ZaloPicture> ZaloPictures { get; set; } = null!;
-        public virtual DbSet<ZaloUser> ZaloUsers { get; set; } = null!;
+        public virtual DbSet<OaCategory> OaCategories { get; set; } = null!;
+        public virtual DbSet<OaFeedback> OaFeedbacks { get; set; } = null!;
+        public virtual DbSet<OaKeyword> OaKeywords { get; set; } = null!;
+        public virtual DbSet<OaPicture> OaPictures { get; set; } = null!;
+        public virtual DbSet<OaUser> OaUsers { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -31,12 +33,26 @@ namespace ZaloOA_v2.Models.DatabaseModels
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ZaloFeedback>(entity =>
+            modelBuilder.Entity<OaCategory>(entity =>
+            {
+                entity.HasKey(e => e.CategoryId)
+                    .HasName("OA_category_pk");
+
+                entity.ToTable("OA_Categories");
+
+                entity.Property(e => e.CategoryId).HasColumnName("category_id");
+
+                entity.Property(e => e.Category)
+                    .HasMaxLength(10)
+                    .HasColumnName("category");
+            });
+
+            modelBuilder.Entity<OaFeedback>(entity =>
             {
                 entity.HasKey(e => e.FeedbackId)
-                    .HasName("Zalo_feedback_pk");
+                    .HasName("OA_feedback_pk");
 
-                entity.ToTable("Zalo_Feedbacks");
+                entity.ToTable("OA_Feedbacks");
 
                 entity.Property(e => e.FeedbackId).HasColumnName("feedback_id");
 
@@ -47,17 +63,38 @@ namespace ZaloOA_v2.Models.DatabaseModels
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.ZaloFeedbacks)
+                    .WithMany(p => p.OaFeedbacks)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("Zalo_feedback_fk");
+                    .HasConstraintName("OA_feedback_fk");
             });
 
-            modelBuilder.Entity<ZaloPicture>(entity =>
+            modelBuilder.Entity<OaKeyword>(entity =>
+            {
+                entity.HasKey(e => e.KeywordId)
+                    .HasName("OA_Keywords_pk");
+
+                entity.ToTable("OA_Keywords");
+
+                entity.Property(e => e.KeywordId).HasColumnName("keyword_id");
+
+                entity.Property(e => e.CategoryId).HasColumnName("category_id");
+
+                entity.Property(e => e.Keyword)
+                    .HasMaxLength(10)
+                    .HasColumnName("keyword");
+
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.OaKeywords)
+                    .HasForeignKey(d => d.CategoryId)
+                    .HasConstraintName("OA_Keywords_fk");
+            });
+
+            modelBuilder.Entity<OaPicture>(entity =>
             {
                 entity.HasKey(e => e.PictureId)
-                    .HasName("Zalo_pic_pk");
+                    .HasName("OA_pic_pk");
 
-                entity.ToTable("Zalo_Pictures");
+                entity.ToTable("OA_Pictures");
 
                 entity.Property(e => e.PictureId).HasColumnName("picture_id");
 
@@ -70,17 +107,17 @@ namespace ZaloOA_v2.Models.DatabaseModels
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.ZaloPictures)
+                    .WithMany(p => p.OaPictures)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("Zalo_pic_fk");
+                    .HasConstraintName("OA_pic_fk");
             });
 
-            modelBuilder.Entity<ZaloUser>(entity =>
+            modelBuilder.Entity<OaUser>(entity =>
             {
                 entity.HasKey(e => e.UserId)
                     .HasName("Zalo_user_pk");
 
-                entity.ToTable("Zalo_users");
+                entity.ToTable("OA_Users");
 
                 entity.Property(e => e.UserId)
                     .ValueGeneratedNever()

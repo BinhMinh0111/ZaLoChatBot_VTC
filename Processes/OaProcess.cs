@@ -6,58 +6,58 @@ namespace ZaloOA_v2.Processes
     public class OaProcess
     {
         private string filePath = Path.GetFullPath("Data\\Messages.txt");
-        public void Process(string json)
+        public Task Process(string json)
         {
-            var textHolder = DataHelper.OAText(json);
+            var textHolder = ObjectsHelper.OAText(json);
             long user_id = long.Parse(textHolder.id);
             Procedures exist = new Procedures();
             if (exist.UserExist(user_id))
             {
                 IsRequest(json);
+                return Task.CompletedTask;
             }
             else
             {
                 DbProcess.AddNewUser(user_id);
                 IsRequest(json);
+                return Task.CompletedTask;
             }
         }
-        private void IsRequest(string json)
+        private Task IsRequest(string json)
         {
-            var textHolder = DataHelper.OAText(json);
-            if (textHolder.text == "#upload")
+            var textHolder = ObjectsHelper.OAText(json);
+            if (textHolder.text == "#upload"|| textHolder.text == "Xin chào, xin vui lòng gửi ảnh của bạn.")
             {
                 KeyValuePair<string, string> requestedUser = new KeyValuePair<string, string>(textHolder.id, DateTime.Now.ToString());
                 //Check in file if exist user then delete else write to file
-                Dictionary<string, string> userList = GetIds(filePath);
+                Dictionary<string, string> userList = DataHelper.GetUsersIds(filePath);
                 if(userList.ContainsKey(requestedUser.Key)== true)
                 {
-                    userList.Remove(requestedUser.Key);
-                    userList.TryAdd(requestedUser.Key, requestedUser.Value);
+                    try 
+                    {
+                        userList.Remove(requestedUser.Key);
+                        userList.TryAdd(requestedUser.Key, requestedUser.Value);
+                        DataHelper.WriteUsers(filePath, userList);
+                        return Task.CompletedTask;
+                    }
+                    catch(Exception ex)
+                    {
+                        LogWriter.LogWrite(ex.Message);
+                        return Task.CompletedTask;
+                    }
                 }
                 else 
                 {
                     userList.TryAdd(requestedUser.Key, requestedUser.Value);
+                    DataHelper.WriteUsers(filePath, userList);
+                    return Task.CompletedTask;
                 }
             }
             else
             {
-                LogWriter.LogWrite(string.Format("user ID: {0} \n Message: {1}", textHolder.id, textHolder.text));
+                //LogWriter.LogWrite(string.Format("user ID: {0} \n Message: {1}", textHolder.id, textHolder.text));
+                return Task.CompletedTask;
             }
-        }
-        private static Dictionary<string,string> GetIds(string filePath)
-        {
-            var list = new Dictionary<string,string>();
-            try
-            {
-                list = File.ReadAllLines(filePath).
-                    Select(x => x.Split('=')).
-                    ToDictionary(x => x[0], x => x[1]);
-            }
-            catch (Exception e)
-            {
-                LogWriter.LogWrite(e.Message);
-            }
-            return list;
         }
     }
 }

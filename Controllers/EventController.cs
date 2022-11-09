@@ -17,22 +17,38 @@ namespace ZaloOA_v2.Controllers
         public void Run(string json)
         {
             //Read and process events
-            var eventHolder = DataHelper.Events(json);
+            var eventHolder = ObjectsHelper.Events(json);
             TextProcess textProcess = new TextProcess();
             PictureProcess pictureProcess = new PictureProcess();
             OaProcess oaProcess = new OaProcess();
+
             if (eventHolder.event_name == "user_send_text")
             {
-                //textProcess.Process(json);
-                Console.WriteLine();
+                var cancelToken = new CancellationTokenSource(10000).Token;
+                Task.Run(() =>
+                {
+                    textProcess.Process(json);
+                    cancelToken.ThrowIfCancellationRequested();
+                }, cancelToken);
             }
             else if (eventHolder.event_name == "user_send_image")
             {
-                pictureProcess.Process(json);
+                var cancelToken = new CancellationTokenSource(10000).Token;
+                Task.Run(() =>
+                {
+                    pictureProcess.Process(json);
+                    cancelToken.ThrowIfCancellationRequested();
+                }, cancelToken);
+                
             }
             else if (eventHolder.event_name == "oa_send_text")
             {
-                oaProcess.Process(json);
+                var cancelToken = new CancellationTokenSource(10000).Token;
+                Task.Run(() =>
+                {
+                    oaProcess.Process(json);
+                    cancelToken.ThrowIfCancellationRequested();
+                }, cancelToken);
             }
             else
             {

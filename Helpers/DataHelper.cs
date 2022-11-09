@@ -1,75 +1,104 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Serilog;
 using ZaloOA_v2.API;
-
+using ZaloOA_v2.Models;
 namespace ZaloOA_v2.Helpers
 {
     public class DataHelper
     {
-        //dynamic object hanlde for Events
-        public static (string? event_name, string? timeStamp) Events(string jsonString)
+        public static string GetToken()
         {
-            var dynamicObject = JsonConvert.DeserializeObject<dynamic>(jsonString)!;
+            Token token = new Token();
+            string filePath = Path.GetFullPath("Data\\Token.txt");
+            string[] lines = GetAllTokens(filePath);
 
-            var eventName = dynamicObject.event_name;
-            var timeStamp = dynamicObject.timeStamp;
-
-            return (eventName, timeStamp);
-        }
-        //dynamic object hanlde User Messages
-        public static (string? id, string? text, string? timeStamp, string msg_id) UserText(string jsonString)
-        {
-            var dynamicObject = JsonConvert.DeserializeObject<dynamic>(jsonString)!;
-
-            var user_id = dynamicObject.sender.id;
-            var text = dynamicObject.message.text;
-            var timeStamp = dynamicObject.timestamp;
-            var msgId = dynamicObject.message.msg_id;
-            return (user_id, text, timeStamp, msgId);
-        }
-        //dynamic object hanlde OA Messages
-        public static (string? id, string? text, string? timeStamp, string msg_id) OAText(string jsonString)
-        {
-            var dynamicObject = JsonConvert.DeserializeObject<dynamic>(jsonString)!;
-
-            var user_id = dynamicObject.recipient.id;
-            var text = dynamicObject.message.text;
-            var timeStamp = dynamicObject.timestamp;
-            var msgId = dynamicObject.message.msg_id;
-            return (user_id, text, timeStamp, msgId);
-        }
-        //dynamic object handle Pictures
-        public static (string? id, List<string>? url, string? timeStamp) UserPicture(string jsonString)
-        {
-            var dynamicObject = JsonConvert.DeserializeObject<dynamic>(jsonString)!;
-
-            var user_id = dynamicObject.sender.id;
-            //Get pic url
-            List<string> pic_url = new List<string>();
-            var Packages = dynamicObject.message.attachments;
-            foreach (var package in Packages)
+            //Check if access token is still valid
+            if (IsRenewToken(lines))
             {
-                string urlString = Convert.ToString(package.payload.url);
-                pic_url.Add(urlString);
+                //if valid return semaphore 1 and access token
+                return lines[0];
             }
-            var timeStamp = dynamicObject.timestamp;
-            return (user_id, pic_url, timeStamp);
+            else
+            {
+                //Call API to get new token
+                GetTokenController getTokenController = new GetTokenController();
+                token = JsonHelper.Deserialize<Token>(getTokenController.AuthToken(lines[1]));
+                //Write new token and refresh token into file
+                WriteToken(filePath, token.access_token, token.refresh_token);
+                //Get token again and return value
+                string[] lines1 = GetAllTokens(filePath);
+                return lines1[0];
+            }
         }
-
-        //dynamic object hanlde User
-        public static (string? user_id, string? user_id_by_app, string? display_name, int? user_gender) Users(long id)
+        //Logic if token expired yet
+        private static bool IsRenewToken(string[] lines)
         {
-            //Get NewUser info
-            GetFollowerController getfollower = new GetFollowerController();
-            Task<string> json = getfollower.Get_follower_detail(id);
-            string newUser = json.Result;
-            //Deserialize User info
-            var dynamicObject = JsonConvert.DeserializeObject<dynamic>(newUser)!;
-            var user_id = dynamicObject.data.user_id;
-            var user_id_app = dynamicObject.data.user_id_by_app;
-            var display_name = dynamicObject.data.display_name;
-            int user_gender = dynamicObject.data.user_gender;
-            return (user_id, user_id_app, display_name, user_gender);
+            DateTime oldTime = DateTime.Parse(lines[2]);
+            DateTime nowTime = DateTime.Now;
+            if ((nowTime.Subtract(oldTime).TotalSeconds) > 90000)
+                return false;
+            return true;
+        }
+        //Get token and refresh code
+        private static string[] GetAllTokens(string filePath)
+        {
+            var list = new List<string>();
+            try
+            {
+                // Open the text file using a stream reader.
+                using (var sr = new StreamReader(filePath))
+                {
+                    // Read the stream as a string, and write the string to the file
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        list.Add(line);
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                LogWriter.LogWrite(e.Message);
+            }
+            //List to array and trim blanks
+            string[] _return = list.ToArray();
+            _return = _return.Where(x => x != null).ToArray();
+            return _return;
+        }
+        //Write token package into file
+        public static void WriteToken(string filePath, string token, string refresh)
+        {           
+            string timeStamp = DateTime.Now.ToString();
+            string[] lines = { token, refresh, timeStamp };
+            using (StreamWriter streamWriter = new StreamWriter(path: filePath))
+            {
+                foreach (string line in lines)
+                {
+                    streamWriter.WriteLine(line);                
+                }
+            }
+        }
+        //Get IDs for Picture process
+        public static Dictionary<string, string> GetUsersIds (string filePath)
+        {
+            var list = new Dictionary<string, string>();
+            try
+            {
+                list = File.ReadAllLines(filePath).
+                    Select(x => x.Split(',')).
+                    ToDictionary(x => x[0], x => x[1]);
+            }
+            catch (Exception e)
+            {
+                LogWriter.LogWrite(e.Message);
+            }
+            return list;
+        }
+        //Update dictionary into Messages.txt
+        public static void WriteUsers (string filePath, Dictionary<string, string> userList)
+        {
+            File.WriteAllLines(filePath,
+                userList.Select(x => $"{x.Key},{x.Value}"));
         }
     }
 }

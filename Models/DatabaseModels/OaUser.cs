@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace ZaloOA_v2.Models.DatabaseModels
 {
-    public partial class ZaloUser
+    public partial class OaUser
     {
-        public ZaloUser()
+        public OaUser()
         {
-            ZaloFeedbacks = new HashSet<ZaloFeedback>();
-            ZaloPictures = new HashSet<ZaloPicture>();
+            OaFeedbacks = new HashSet<OaFeedback>();
+            OaPictures = new HashSet<OaPicture>();
         }
 
         public long UserId { get; set; }
@@ -17,7 +17,7 @@ namespace ZaloOA_v2.Models.DatabaseModels
         public int? UserGender { get; set; }
         public bool? UserState { get; set; }
 
-        public virtual ICollection<ZaloFeedback> ZaloFeedbacks { get; set; }
-        public virtual ICollection<ZaloPicture> ZaloPictures { get; set; }
+        public virtual ICollection<OaFeedback> OaFeedbacks { get; set; }
+        public virtual ICollection<OaPicture> OaPictures { get; set; }
     }
 }

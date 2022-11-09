@@ -10,12 +10,12 @@ namespace ZaloOA_v2.Processes
         public static void AddNewUser(long user_id)
         {
             db_a8ebff_kenjenorContext context = new db_a8ebff_kenjenorContext();
-            var userholder = DataHelper.Users(user_id);
+            var userholder = ObjectsHelper.Users(user_id);
             try
             {
                 using (context)
                 {
-                    var zaloUser = new ZaloUser
+                    var zaloUser = new OaUser
                     {
                         UserId = long.Parse(userholder.user_id),
                         UserIdByApp = long.Parse(userholder.user_id_by_app),
@@ -23,7 +23,7 @@ namespace ZaloOA_v2.Processes
                         UserGender = userholder.user_gender,
                         UserState = true
                     };
-                    context.ZaloUsers.Add(zaloUser);
+                    context.OaUsers.Add(zaloUser);
                     context.SaveChanges();
                 }
             }
@@ -35,18 +35,18 @@ namespace ZaloOA_v2.Processes
         public static void AddText(string json)
         {
             db_a8ebff_kenjenorContext context = new db_a8ebff_kenjenorContext();
-            var textHolder = DataHelper.UserText(json);
+            var textHolder = ObjectsHelper.UserText(json);
             try
             {
                 using (context)
                 {
-                    var zaloFeedback = new ZaloFeedback
+                    var zaloFeedback = new OaFeedback
                     {
                         UserId = long.Parse(textHolder.id),
                         Feedbacks = textHolder.text,
                         Timestamp = long.Parse(textHolder.timeStamp)
                     };
-                    context.ZaloFeedbacks.Add(zaloFeedback);
+                    context.OaFeedbacks.Add(zaloFeedback);
                     context.SaveChanges();
                 }
             }
@@ -58,27 +58,41 @@ namespace ZaloOA_v2.Processes
         public static void AddPicture(string json)
         {
             db_a8ebff_kenjenorContext context = new db_a8ebff_kenjenorContext();
-            var pictureHolder = DataHelper.UserPicture(json);
-            List<ZaloPicture> pictureList = new List<ZaloPicture>();
-            foreach (string item in pictureHolder.url)
-            {
-                pictureList.Add(new ZaloPicture()
-                { UserId = long.Parse(pictureHolder.id), PicUrl = item, Timestamp = long.Parse(pictureHolder.timeStamp) });
-            }
+            var pictureHolder = ObjectsHelper.UserPicture(json);
             try
             {
                 using (context)
                 {
-                    foreach (ZaloPicture picture in pictureList)
+                    var zaloPicture = new OaPicture
                     {
-                        var zaloPicture = new ZaloPicture
-                        {
-                            UserId = picture.UserId,
-                            PicUrl = picture.PicUrl,
-                            Timestamp = picture.Timestamp
-                        };
-                        context.ZaloPictures.Add(zaloPicture);
-                    }
+                        UserId = long.Parse(pictureHolder.id),
+                        PicUrl = pictureHolder.url.First(),
+                        Timestamp = long.Parse(pictureHolder.timeStamp)
+                    };
+                    context.OaPictures.Add(zaloPicture);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.LogWrite(ex.Message);
+            }
+        }
+        public static void AddPath(string json,string path)
+        {
+            db_a8ebff_kenjenorContext context = new db_a8ebff_kenjenorContext();
+            var pictureHolder = ObjectsHelper.UserPicture(json);
+            try
+            {
+                using (context)
+                {
+                    var zaloPicture = new OaPicture
+                    {
+                        UserId = long.Parse(pictureHolder.id),
+                        PicUrl = path,
+                        Timestamp = long.Parse(pictureHolder.timeStamp)
+                    };
+                    context.OaPictures.Add(zaloPicture);
                     context.SaveChanges();
                 }
             }

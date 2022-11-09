@@ -5,50 +5,58 @@ namespace ZaloOA_v2.Processes
 {
     public class TextProcess
     {
-        public void Process(string json)
+        private string filePath = Path.GetFullPath("Data\\Messages.txt");
+        public Task Process(string json)
         {
-            var textHolder = DataHelper.UserText(json);
+            var textHolder = ObjectsHelper.UserText(json);
             long user_id = long.Parse(textHolder.id);
             Procedures exist = new Procedures();
             if (exist.UserExist(user_id))
             {
-                Console.WriteLine();
-                //DbProcess.AddText(json);
+                IsRequest(json);
+                return Task.CompletedTask;
             }
             else
             {
-                Console.WriteLine();
-                //DbProcess.AddNewUser(user_id);
-                //DbProcess.AddText(json);
+                DbProcess.AddNewUser(user_id);
+                IsRequest(json);
+                return Task.CompletedTask;
             }
         }
-        public void IsRequest(string json)
+        private Task IsRequest(string json)
         {
-            var textHolder = DataHelper.UserText(json);
-            if (textHolder.text == "#upload")
+            var textHolder = ObjectsHelper.UserText(json);
+            if (textHolder.text == "#upload:")
             {
-                KeyValuePair<string, string> requestUser = new KeyValuePair<string, string>(textHolder.id, DateTime.Now.ToString());
+                KeyValuePair<string, string> requestedUser = new KeyValuePair<string, string>(textHolder.id, DateTime.Now.ToString());
                 //Check in file if exist user then delete else write to file
+                Dictionary<string, string> userList = DataHelper.GetUsersIds(filePath);
+                if (userList.ContainsKey(requestedUser.Key) == true)
+                {
+                    try
+                    {
+                        userList.Remove(requestedUser.Key);
+                        userList.TryAdd(requestedUser.Key, requestedUser.Value);
+                        DataHelper.WriteUsers(filePath, userList);
+                        return Task.CompletedTask;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogWriter.LogWrite(ex.Message);
+                        return Task.CompletedTask;
+                    }
+                }
+                else
+                {
+                    userList.TryAdd(requestedUser.Key, requestedUser.Value);
+                    DataHelper.WriteUsers(filePath, userList);
+                    return Task.CompletedTask;
+                }
             }
             else
             {
-                LogWriter.LogWrite(string.Format("user ID: {0} \n Message: {1}", textHolder.id, textHolder.text));
-            }
-        }
-        public static void Reply(long userId, string text)
-        {
-            try
-            {
-                var cancelToken = new CancellationTokenSource(3000).Token;
-                Task.Run(async () =>
-                {
-                    ReplyController.SendMessage(userId, text);
-                    cancelToken.ThrowIfCancellationRequested();
-                }, cancelToken);
-            }
-            catch (Exception ex)
-            {
-                LogWriter.LogWrite(ex.Message);
+                //LogWriter.LogWrite(string.Format("user ID: {0} \n Message: {1}", textHolder.id, textHolder.text));
+                return Task.CompletedTask;
             }
         }
     }

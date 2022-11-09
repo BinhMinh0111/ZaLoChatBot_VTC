@@ -56,9 +56,10 @@ namespace ZaloOA_v2.Helpers
                     }
                 }
             }
-            catch (IOException e)
+            catch (IOException ex)
             {
-                LogWriter.LogWrite(e.Message);
+                string error = string.Format("DataHelper:GetAllTokens \n {0}", ex.Message);
+                LogWriter.LogWrite(error);
             }
             //List to array and trim blanks
             string[] _return = list.ToArray();
@@ -88,9 +89,10 @@ namespace ZaloOA_v2.Helpers
                     Select(x => x.Split(',')).
                     ToDictionary(x => x[0], x => x[1]);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                LogWriter.LogWrite(e.Message);
+                string error = string.Format("DataHelper:GetUsersIds \n {0}", ex.Message);
+                LogWriter.LogWrite(error);
             }
             return list;
         }

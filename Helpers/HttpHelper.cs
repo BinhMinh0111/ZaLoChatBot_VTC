@@ -64,7 +64,8 @@ namespace ZaloOA_v2.Helpers
             }
             catch (Exception ex)
             {
-                LogWriter.LogWrite(ex.Message);
+                string error = string.Format("HttpHelper \n {0}", ex.Message);
+                LogWriter.LogWrite(error);
                 statusCode = HttpStatusCode.NotFound;
             }
 

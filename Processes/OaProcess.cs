@@ -42,7 +42,8 @@ namespace ZaloOA_v2.Processes
                     }
                     catch(Exception ex)
                     {
-                        LogWriter.LogWrite(ex.Message);
+                        string error = string.Format("Processes:OAProcess:IsRequest \n {0}", ex.Message);
+                        LogWriter.LogWrite(error);
                         return Task.CompletedTask;
                     }
                 }

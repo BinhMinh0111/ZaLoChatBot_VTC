@@ -35,7 +35,8 @@ namespace ZaloOA_v2.API
             }
             catch (Exception ex)
             {
-                LogWriter.LogWrite(ex.Message);
+                string error = string.Format("API:ListenerController:Listen \n {0}", ex.Message);
+                LogWriter.LogWrite(error);
             }           
             return result;
         }

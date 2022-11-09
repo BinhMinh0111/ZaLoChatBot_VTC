@@ -20,8 +20,8 @@ app.UseSwaggerUI();
 app.UseSwagger(x => x.SerializeAsV2 = true);
 
 //logging
-var loggerFactory = app.Services.GetService<ILoggerFactory>();
-loggerFactory.AddFile(builder.Configuration["Logging:LogFilePath"].ToString());
+//var loggerFactory = app.Services.GetService<ILoggerFactory>();
+//loggerFactory.AddFile(builder.Configuration["Logging:LogFilePath"].ToString());
 
 // Configure the HTTP request pipeline.
 

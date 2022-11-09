@@ -33,7 +33,8 @@ namespace ZaloOA_v2.Processes
             }
             catch (SqlException ex)
             {
-                LogWriter.LogWrite(ex.Message);
+                string error = string.Format("Processes:Procedure:UserExist \n {0}", ex.Message);
+                LogWriter.LogWrite(error);
             }
             return false;
         }
@@ -53,7 +54,8 @@ namespace ZaloOA_v2.Processes
                 }
                 catch (SqlException ex)
                 {
-                    LogWriter.LogWrite(ex.Message);
+                    string error = string.Format("Processes:Procedure:GetDisplayName \n {0}", ex.Message);
+                    LogWriter.LogWrite(error);
                 }
             }
             return displayName;

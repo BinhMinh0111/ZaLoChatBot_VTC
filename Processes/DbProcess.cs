@@ -29,7 +29,8 @@ namespace ZaloOA_v2.Processes
             }
             catch (Exception ex)
             {
-                LogWriter.LogWrite(ex.Message);
+                string error = string.Format("Processes:DbProcess:AddNewUser \n {0}", ex.Message);
+                LogWriter.LogWrite(error);
             }
         }
         public static void AddText(string json)
@@ -52,7 +53,8 @@ namespace ZaloOA_v2.Processes
             }
             catch (Exception ex)
             {
-                LogWriter.LogWrite(ex.Message);
+                string error = string.Format("Processes:DbProcess:AddText \n {0}", ex.Message);
+                LogWriter.LogWrite(error);
             }
         }
         public static void AddPicture(string json)
@@ -75,7 +77,8 @@ namespace ZaloOA_v2.Processes
             }
             catch (Exception ex)
             {
-                LogWriter.LogWrite(ex.Message);
+                string error = string.Format("Processes:DbProcess:AddPicture \n {0}", ex.Message);
+                LogWriter.LogWrite(error);
             }
         }
         public static void AddPath(string json,string path)
@@ -98,7 +101,8 @@ namespace ZaloOA_v2.Processes
             }
             catch (Exception ex)
             {
-                LogWriter.LogWrite(ex.Message);
+                string error = string.Format("Processes:DbProcess:AddPath \n {0}", ex.Message);
+                LogWriter.LogWrite(error);
             }
         }
     }

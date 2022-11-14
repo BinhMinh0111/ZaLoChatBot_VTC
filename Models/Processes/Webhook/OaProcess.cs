@@ -1,14 +1,15 @@
-﻿using ZaloOA_v2.Controllers;
+﻿using System.Collections.Generic;
 using ZaloOA_v2.Helpers;
+using ZaloOA_v2.Processes;
 
-namespace ZaloOA_v2.Processes
+namespace ZaloOA_v2.Models.Processes.Webhook
 {
-    public class TextProcess
+    public class OaProcess
     {
         private string filePath = Path.GetFullPath("Data\\Messages.txt");
         public Task Process(string json)
         {
-            var textHolder = ObjectsHelper.UserText(json);
+            var textHolder = ObjectsHelper.OAText(json);
             long user_id = long.Parse(textHolder.id);
             Procedures exist = new Procedures();
             if (exist.UserExist(user_id))
@@ -25,8 +26,8 @@ namespace ZaloOA_v2.Processes
         }
         private Task IsRequest(string json)
         {
-            var textHolder = ObjectsHelper.UserText(json);
-            if (textHolder.text == "#upload:")
+            var textHolder = ObjectsHelper.OAText(json);
+            if (textHolder.text == "#upload" || textHolder.text == "Xin vui lòng gửi ảnh của bạn.")
             {
                 KeyValuePair<string, string> requestedUser = new KeyValuePair<string, string>(textHolder.id, DateTime.Now.ToString());
                 //Check in file if exist user then delete else write to file
@@ -42,7 +43,7 @@ namespace ZaloOA_v2.Processes
                     }
                     catch (Exception ex)
                     {
-                        string error = string.Format("Processes:TextProcess:IsRequest \n {0}", ex.Message);
+                        string error = string.Format("Processes:OAProcess:IsRequest \n {0}", ex.Message);
                         LogWriter.LogWrite(error);
                         return Task.CompletedTask;
                     }

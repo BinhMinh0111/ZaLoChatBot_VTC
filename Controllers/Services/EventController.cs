@@ -8,9 +8,9 @@ using Microsoft.Extensions.Configuration;
 using System.Configuration;
 using System.Diagnostics;
 using ZaloOA_v2.Models.DatabaseModels;
-using ZaloOA_v2.Processes;
+using ZaloOA_v2.Models.Processes.Webhook;
 
-namespace ZaloOA_v2.Controllers
+namespace ZaloOA_v2.Controllers.Services
 {
     public class EventController : Controller
     {
@@ -21,6 +21,7 @@ namespace ZaloOA_v2.Controllers
             TextProcess textProcess = new TextProcess();
             PictureProcess pictureProcess = new PictureProcess();
             OaProcess oaProcess = new OaProcess();
+            OaFollowProcess followProcess = new OaFollowProcess();
 
             if (eventHolder.event_name == "user_send_text")
             {
@@ -39,7 +40,7 @@ namespace ZaloOA_v2.Controllers
                     pictureProcess.Process(json);
                     cancelToken.ThrowIfCancellationRequested();
                 }, cancelToken);
-                
+
             }
             else if (eventHolder.event_name == "oa_send_text")
             {
@@ -50,6 +51,33 @@ namespace ZaloOA_v2.Controllers
                     cancelToken.ThrowIfCancellationRequested();
                 }, cancelToken);
             }
+            else if (eventHolder.event_name == "follow" || eventHolder.event_name == "unfollow")
+            {
+                var cancelToken = new CancellationTokenSource(10000).Token;
+                Task.Run(() =>
+                {
+                    followProcess.Process(json, eventHolder.event_name);
+                    cancelToken.ThrowIfCancellationRequested();
+                }, cancelToken);
+            }
+            else if (eventHolder.event_name == "user_received_message")
+            {
+                var cancelToken = new CancellationTokenSource(10000).Token;
+                Task.Run(() =>
+                {
+                    //something
+                    cancelToken.ThrowIfCancellationRequested();
+                }, cancelToken);
+            }
+            else if (eventHolder.event_name == "user_seen_message")
+            {
+                var cancelToken = new CancellationTokenSource(10000).Token;
+                Task.Run(() =>
+                {
+                    //something
+                    cancelToken.ThrowIfCancellationRequested();
+                }, cancelToken);
+            }
             else
             {
                 //ghi log even + timestamp
@@ -57,6 +85,6 @@ namespace ZaloOA_v2.Controllers
             }
 
         }
-       
+
     }
 }

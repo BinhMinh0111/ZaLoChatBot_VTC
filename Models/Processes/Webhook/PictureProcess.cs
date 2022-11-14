@@ -3,8 +3,9 @@ using System.Net;
 using System.Security.Policy;
 using ZaloOA_v2.Controllers;
 using ZaloOA_v2.Helpers;
+using ZaloOA_v2.Processes;
 
-namespace ZaloOA_v2.Processes
+namespace ZaloOA_v2.Models.Processes.Webhook
 {
     public class PictureProcess
     {
@@ -51,10 +52,10 @@ namespace ZaloOA_v2.Processes
                 }
                 //else download picture and 
                 else
-                {                   
+                {
                     string url = picHolder.url.First();
-                    string picPath = (string.Format("PicturesFiles\\{0}\\{1}\\", requestedUser,DateTime.Now.ToString("dd_MM_yyyy")));
-                    try 
+                    string picPath = string.Format("Data\\PicturesFiles\\{0}\\{1}\\", requestedUser, DateTime.Now.ToString("dd_MM_yyyy"));
+                    try
                     {
                         var cancelToken = new CancellationTokenSource(10000).Token;
                         Task.Run(() =>
@@ -66,10 +67,10 @@ namespace ZaloOA_v2.Processes
                             //Save pic's url if failed to download
                             savePicPath(json, downloadPath);
                             cancelToken.ThrowIfCancellationRequested();
-                        }, cancelToken);                 
+                        }, cancelToken);
                         return Task.CompletedTask;
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         string error = string.Format("Processes:PictureProcess:IsRequest \n {0}", ex.Message);
                         LogWriter.LogWrite(error);
@@ -81,18 +82,16 @@ namespace ZaloOA_v2.Processes
             //If not exist in messages.txt file means user did not sent request so just log user messages
             else
             {
-                //userList.TryAdd(requestedUser, requestedTime.ToString());
-                //DataHelper.WriteUsers(filePath, userList);
                 LogWriter.LogWrite(string.Format("User ID: {0} \n Time: {1}", requestedUser, requestedTime.ToString()));
                 return Task.CompletedTask;
             }
         }
-        private string DownloadPicture (string picPath, string url, string timeStamp)
+        private string DownloadPicture(string picPath, string url, string timeStamp)
         {
             //Int32 unixTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
             //string time = DateTime.Now.ToString("ss_mm_HH_dd_MM_yyyy");
             //TicksHelper.EncodeTransmissionTimestamp(DateTime.Now)
-            string filename = timeStamp + ".jpg";
+            string filename = timeStamp + "_" + Guid.NewGuid().ToString("N").Substring(0, 6) + ".jpg";
             try
             {
                 using (WebClient myWebClient = new WebClient())
@@ -117,9 +116,9 @@ namespace ZaloOA_v2.Processes
                 return "Failed";
             }
         }
-        private Task savePicPath (string json,string path)
+        private Task savePicPath(string json, string path)
         {
-            if(path == "Failed")
+            if (path == "Failed")
             {
                 var cancelToken = new CancellationTokenSource(4000).Token;
                 Task.Run(() =>
@@ -134,11 +133,11 @@ namespace ZaloOA_v2.Processes
                 var cancelToken = new CancellationTokenSource(4000).Token;
                 Task.Run(() =>
                 {
-                    DbProcess.AddPath(json,path);
+                    DbProcess.AddPath(json, path);
                     cancelToken.ThrowIfCancellationRequested();
                 }, cancelToken);
                 return Task.CompletedTask;
-            }    
+            }
             return Task.CompletedTask;
         }
     }

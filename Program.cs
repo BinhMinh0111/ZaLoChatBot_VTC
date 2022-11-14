@@ -9,19 +9,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
 
 
 var app = builder.Build();
 
-app.UseSwaggerUI();
-app.UseSwagger(x => x.SerializeAsV2 = true);
-
-//logging
-//var loggerFactory = app.Services.GetService<ILoggerFactory>();
-//loggerFactory.AddFile(builder.Configuration["Logging:LogFilePath"].ToString());
+//app.UseSwaggerUI();
+//app.UseSwagger(x => x.SerializeAsV2 = true);
 
 // Configure the HTTP request pipeline.
 
@@ -30,5 +27,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

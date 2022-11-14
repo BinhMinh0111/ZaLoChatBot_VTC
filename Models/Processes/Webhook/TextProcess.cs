@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using ZaloOA_v2.Controllers;
 using ZaloOA_v2.Helpers;
+using ZaloOA_v2.Processes;
 
-namespace ZaloOA_v2.Processes
+namespace ZaloOA_v2.Models.Processes.Webhook
 {
-    public class OaProcess
+    public class TextProcess
     {
         private string filePath = Path.GetFullPath("Data\\Messages.txt");
         public Task Process(string json)
         {
-            var textHolder = ObjectsHelper.OAText(json);
+            var textHolder = ObjectsHelper.UserText(json);
             long user_id = long.Parse(textHolder.id);
             Procedures exist = new Procedures();
             if (exist.UserExist(user_id))
@@ -25,29 +26,29 @@ namespace ZaloOA_v2.Processes
         }
         private Task IsRequest(string json)
         {
-            var textHolder = ObjectsHelper.OAText(json);
-            if (textHolder.text == "#upload"|| textHolder.text == "Xin chào, xin vui lòng gửi ảnh của bạn.")
+            var textHolder = ObjectsHelper.UserText(json);
+            if (textHolder.text == "#upload:")
             {
                 KeyValuePair<string, string> requestedUser = new KeyValuePair<string, string>(textHolder.id, DateTime.Now.ToString());
                 //Check in file if exist user then delete else write to file
                 Dictionary<string, string> userList = DataHelper.GetUsersIds(filePath);
-                if(userList.ContainsKey(requestedUser.Key)== true)
+                if (userList.ContainsKey(requestedUser.Key) == true)
                 {
-                    try 
+                    try
                     {
                         userList.Remove(requestedUser.Key);
                         userList.TryAdd(requestedUser.Key, requestedUser.Value);
                         DataHelper.WriteUsers(filePath, userList);
                         return Task.CompletedTask;
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        string error = string.Format("Processes:OAProcess:IsRequest \n {0}", ex.Message);
+                        string error = string.Format("Processes:TextProcess:IsRequest \n {0}", ex.Message);
                         LogWriter.LogWrite(error);
                         return Task.CompletedTask;
                     }
                 }
-                else 
+                else
                 {
                     userList.TryAdd(requestedUser.Key, requestedUser.Value);
                     DataHelper.WriteUsers(filePath, userList);

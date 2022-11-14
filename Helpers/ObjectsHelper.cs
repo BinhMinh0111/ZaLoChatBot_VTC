@@ -71,5 +71,15 @@ namespace ZaloOA_v2.Helpers
             int user_gender = dynamicObject.data.user_gender;
             return (user_id, user_id_app, display_name, user_gender);
         }
+
+        //dynamic object hanlde user follow OA
+        public static (string? id, string? source) UserFollow(string jsonString)
+        {
+            var dynamicObject = JsonConvert.DeserializeObject<dynamic>(jsonString)!;
+
+            var user_id = dynamicObject.follower.id;
+            var followSource = dynamicObject.source;
+            return (user_id, followSource);
+        }
     }
 }

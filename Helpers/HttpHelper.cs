@@ -60,15 +60,17 @@ namespace ZaloOA_v2.Helpers
                         }
                     }
                 }
+                Console.WriteLine(responseData);
                 LogWriter.LogWrite(responseData);
             }
             catch (Exception ex)
             {
                 string error = string.Format("HttpHelper \n {0}", ex.Message);
                 LogWriter.LogWrite(error);
+                Console.WriteLine(error);
                 statusCode = HttpStatusCode.NotFound;
             }
-
+            Console.WriteLine(responseData);
             return responseData;
         }
     }

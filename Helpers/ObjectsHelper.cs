@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Serilog;
+using System.Dynamic;
 using ZaloOA_v2.API;
 
 namespace ZaloOA_v2.Helpers
@@ -57,7 +58,7 @@ namespace ZaloOA_v2.Helpers
         }
 
         //dynamic object hanlde User
-        public static (string? user_id, string? user_id_by_app, string? display_name, int? user_gender) Users(long id)
+        public static (string? user_id, string? user_id_by_app, string? display_name, short? user_gender) Users(long id)
         {
             //Get NewUser info
             GetFollowerController getfollower = new GetFollowerController();
@@ -68,7 +69,7 @@ namespace ZaloOA_v2.Helpers
             var user_id = dynamicObject.data.user_id;
             var user_id_app = dynamicObject.data.user_id_by_app;
             var display_name = dynamicObject.data.display_name;
-            int user_gender = dynamicObject.data.user_gender;
+            short user_gender = dynamicObject.data.user_gender;
             return (user_id, user_id_app, display_name, user_gender);
         }
 
@@ -80,6 +81,15 @@ namespace ZaloOA_v2.Helpers
             var user_id = dynamicObject.follower.id;
             var followSource = dynamicObject.source;
             return (user_id, followSource);
+        }
+        //dynamic object hanlde user recive/seen OA message
+        public static (string? id, string event_name) UserReceive(string jsonString)
+        {
+            var dynamicObject = JsonConvert.DeserializeObject<dynamic>(jsonString)!;
+
+            var user_id = dynamicObject.recipient.id;
+            var eventName = dynamicObject.event_name;
+            return (user_id, eventName);
         }
     }
 }

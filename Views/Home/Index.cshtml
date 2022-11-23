@@ -1,24 +1,42 @@
-﻿@{
+﻿@model List<ZaloOA_v2.Models.ViewModels.UsersViewModel>
+@{
     ViewData["Title"] = "Index";
 }
 
-<form>
-    <h2>Lấy danh sách tất cả user</h2>
-
-    <button>Lấy</button>
-
+@using (Html.BeginForm("SendToUsers","Home",FormMethod.Post))
+{
+    <h2>Danh sách tất cả user</h2>
     <table>
         <thead>
-            <tr> 
-                <th>ID</th>
-                <th>Tên</th>
-                <th>
-                    All
-                    <input type="checkbox" id="userID" name="checkboxi" value="1">
-                </th>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model[0].UserId)</th>
+                <th>@Html.DisplayNameFor(model => model[0].DisplayName)</th>
+
+                <th>All@*<INPUT type="checkbox" id="checkAll" name="checkAll" />*@ @Html.CheckBox("checkAll")</th>
             </tr>
         </thead>
+        @for (int i = 0; i< Model.Count();i+=1)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(model => model[i].UserId)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model[i].DisplayName)
+                </td>
+                <td>
+                    @Html.CheckBoxFor(model => model[i].isSelected)
+                </td>
+                @Html.HiddenFor(model => model[i].UserId)
+                @Html.HiddenFor(model => model[i].DisplayName)
+                @Html.HiddenFor(model => model[i].isSelected)
+            </tr>
+        }
     </table>
-
-    <button>Gửi</button>
-</form>
+    <input type="text" id="text" name="text">
+    <br>
+    <br>
+    <input id="submit" type="submit" value="Gửi">
+}
+@*<form action="Home/SendToUsers" method="post">
+</form>*@

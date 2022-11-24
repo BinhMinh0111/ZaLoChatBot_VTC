@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 using ZaloOA_v2.Helpers;
+using ZaloOA_v2.Models.DAO;
 using ZaloOA_v2.Models.DTO;
 
 namespace ZaloOA_v2.Processes

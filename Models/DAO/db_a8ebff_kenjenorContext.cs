@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace ZaloOA_v2.Models.DTO
+namespace ZaloOA_v2.Models.DAO
 {
     public partial class db_a8ebff_kenjenorContext : DbContext
     {
@@ -45,6 +45,12 @@ namespace ZaloOA_v2.Models.DTO
                     .HasColumnName("Message_id");
 
                 entity.Property(e => e.NoticeId).HasColumnName("Notice_id");
+
+                entity.Property(e => e.State).HasColumnName("state");
+
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.UserId).HasColumnName("User_id");
 

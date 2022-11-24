@@ -1,4 +1,6 @@
-﻿using ZaloOA_v2.Helpers;
+﻿using System.Threading.Tasks.Sources;
+using ZaloOA_v2.Helpers;
+using ZaloOA_v2.Models.DAO;
 using ZaloOA_v2.Models.DTO;
 using ZaloOA_v2.Repositories.Interfaces;
 
@@ -13,9 +15,9 @@ namespace ZaloOA_v2.DAA
             this.context = context;
         }
 
-        public Notice GetNotice(long NoticeId)
+        public NoticeDTO GetNotice(long NoticeId)
         {
-            Notice returnNotice = new Notice();
+            NoticeDTO returnNotice = new NoticeDTO();
             try
             {
                 using (context)
@@ -41,9 +43,9 @@ namespace ZaloOA_v2.DAA
             return returnNotice;
         }
 
-        public List<Notice> GetAllNotices()
+        public List<NoticeDTO> GetAllNotices()
         {
-            List<Notice> returnNotice = new List<Notice> ();
+            List<NoticeDTO> returnNotice = new List<NoticeDTO> ();
             try
             {
                 using (context)
@@ -51,7 +53,7 @@ namespace ZaloOA_v2.DAA
                     var notices = context.OaNotices;
                     foreach (var item in notices)
                     {
-                        Notice notice = new Notice
+                        NoticeDTO notice = new NoticeDTO
                         {
                             NoticeId = item.NoticeId,
                             NoticeDate = item.NoticeDate,
@@ -70,42 +72,41 @@ namespace ZaloOA_v2.DAA
             return returnNotice;
         }
 
-        public List<Notice> GetPageNotices(int offset, int range, string? condition)
+        public List<NoticeDTO> GetPageNotices(int offset, int range, string? condition)
         {
             throw new NotImplementedException();
         }
 
-        public bool Add(Notice notice)
+        public async Task Add(NoticeDTO notice)
         {
             try
             {
-                using (context)
-                {
+                //await using (context)
+                //{
                     var OANotice = new OaNotice
                     {
                         NoticeId = notice.NoticeId,
                         NoticeDate = notice.NoticeDate,
+                        NumNotice = notice.NumNotice,
                         ContentUrl = notice.ContentUrl,
                     };
                     context.OaNotices.Add(OANotice);
                     context.SaveChanges();
-                }
-                return true;
+                //}
             }
             catch (Exception ex)
             {
                 string error = string.Format("BussinessProcesses:DatabaseProcess:DAO:PostUser \n {0}", ex.Message);
                 LogWriter.LogWrite(error);
-                return false;
             }
         }
 
-        public bool Update(Notice noticeChanges)
+        public Task Update(NoticeDTO noticeChanges)
         {
             throw new NotImplementedException();
         }
 
-        public bool Delete(long NoticeId)
+        public Task Delete(long NoticeId)
         {
             throw new NotImplementedException();
         }

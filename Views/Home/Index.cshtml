@@ -38,5 +38,8 @@
     <br>
     <input id="submit" type="submit" value="Gửi">
 }
-@*<form action="Home/SendToUsers" method="post">
-</form>*@
+
+@using (Html.BeginForm("SendToUsers","Home",FormMethod.Post))
+{
+    <h2>Thống Kê Thông Báo Đã Gửi</h2>
+}

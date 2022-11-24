@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ZaloOA_v2.Models.DTO
+namespace ZaloOA_v2.Models.DAO
 {
     public partial class OaUser
     {

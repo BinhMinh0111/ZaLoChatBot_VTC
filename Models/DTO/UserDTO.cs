@@ -1,6 +1,6 @@
 ﻿namespace ZaloOA_v2.Models.ServiceModels
 {
-    public class User
+    public class UserDTO
     {
         public long UserId { get; set; }
         public long? IdByApp { get; set; }

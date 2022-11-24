@@ -43,41 +43,51 @@ namespace ZaloOA_v2.Controllers
         }
 
         [HttpPost]
-        public string SendToUsers (bool checkAll, List<UsersViewModel> model, string text)
+        public async Task<ActionResult> SendToUsers (bool checkAll, List<UsersViewModel> model, string text)
         {
             MessagesServices messagesServices = new MessagesServices(messagesRepository,usersRepository);
             NoticeServices noticeServices = new NoticeServices(noticesRepository);
             if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text))
             {
-                Console.WriteLine("Bạn chưa nhap noi dung!");
-                Console.WriteLine(text);
-                return "Bạn chưa nhap noi dung!";
+                return Content("Bạn chưa nhap noi dung!");
+                //return "Bạn chưa nhap noi dung!";
             }
             if(checkAll)
             {
-                Console.WriteLine(checkAll +", "+ text);
-                noticeServices.AddNewNotice(text);
-                messagesServices.SendMessAllUsers(text);
-                return checkAll + ", " + text;
+                int totalUsers = usersRepository.UsersTotal();
+                Task.Run(async () =>
+                {
+                    Int32 noticeId = await noticeServices.AddNewNotice(text, totalUsers);
+                    await messagesServices.SendMessAllUsers(text, noticeId);
+                });                  
+                //return checkAll + ", " + text;
+                return Content("Sent all!");
             }
             else if (model.Count(x => x.isSelected) == 0)
             {
-                Console.WriteLine(checkAll);
-                return "Bạn chưa chọn người gửi!";
+                //return "Bạn chưa chọn người gửi!";
+                return Content("Bạn chưa chọn người gửi!");
             }
             else
             {
-                noticeServices.AddNewNotice(text);
-
                 List<UsersViewModel> users = new List<UsersViewModel>();
                 users = model;
-                List<User> sendList = new List<User>();
-
-                users.RemoveAll(user => user.isSelected == false);
-                sendList = messagesServices.UserViewToUserModel(users);
-                messagesServices.SendMessUsers(sendList, text);
-                return "Sent!";
+                List<UserDTO> sendList = new List<UserDTO>();
+                Task.Run(async () => 
+                {
+                    users.RemoveAll(user => user.isSelected == false);
+                    sendList = messagesServices.UserViewToUserModel(users);
+                    Int32 noticeId = await noticeServices.AddNewNotice(text, sendList.Count());
+                    await messagesServices.SendMessUsers(sendList, text, noticeId);
+                });                
+                //return "Sent!";
+                return Content("Sent by list!");
             }     
+        }
+        [HttpPost]
+        public async Task NoticeReport()
+        {
+
         }
     }
 }

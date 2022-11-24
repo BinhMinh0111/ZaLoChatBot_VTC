@@ -4,11 +4,11 @@ namespace ZaloOA_v2.Repositories.Interfaces
 {
     public interface IPicturesRepository
     {
-        Picture GetPictures(int PictureId);
-        List<Picture> GetAllPictures();
-        List<Picture> GetPagePictures(int offset, int range);
+        PictureDTO GetPictures(int PictureId);
+        List<PictureDTO> GetAllPictures();
+        List<PictureDTO> GetPagePictures(int offset, int range);
         bool Add(string json, string path);
-        bool Update(Picture pictureChanges);
+        bool Update(PictureDTO pictureChanges);
         bool Delete(int PictureId);
     }
 }

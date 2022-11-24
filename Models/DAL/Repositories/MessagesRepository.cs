@@ -1,5 +1,5 @@
 ﻿using ZaloOA_v2.Helpers;
-using ZaloOA_v2.Models.DTO;
+using ZaloOA_v2.Models.DAO;
 using ZaloOA_v2.Models.ServiceModels;
 using ZaloOA_v2.Repositories.Interfaces;
 
@@ -13,9 +13,9 @@ namespace ZaloOA_v2.DAO
         {
             this.context = context;
         }
-        public Message GetMessage(string MessageId)
+        public MessageDTO GetMessage(string MessageId)
         {
-            Message returnMessage = new Message();
+            MessageDTO returnMessage = new MessageDTO();
             try
             {
                 using (context)
@@ -40,47 +40,48 @@ namespace ZaloOA_v2.DAO
             return returnMessage;
         }
 
-        public List<Message> GetAllMessages()
+        public List<MessageDTO> GetAllMessages()
         {
             throw new NotImplementedException();
         }
 
-        public List<Message> GetPageMessages(int offset, int range, string? conditions)
+        public List<MessageDTO> GetPageMessages(int offset, int range, string? conditions)
         {
             throw new NotImplementedException();
         }
 
-        public bool Add(Message message)
+        public async Task Add(MessageDTO message)
         {
             try
             {
-                using (context)
-                {
+                //await using (context)
+                //{
                     var OaMessage = new OaMessage
                     {
                         MessageId = message.MessageId,
                         NoticeId = message.NoticeId,
                         UserId = message.UserId, 
+                        State = message.State,
+                        Status = message.Status
                     };
                     context.OaMessages.Add(OaMessage);
                     context.SaveChanges();
-                }
-                return true;
+                    Console.WriteLine("Saved message");
+                //}
             }
             catch (Exception ex)
             {
-                string error = string.Format("Repositories:GUID:PostMessages \n {0}", ex.Message);
+                string error = string.Format("Model:Repositories:MessagesRepository:Add \n {0}", ex.Message);
                 LogWriter.LogWrite(error);
-                return false;
             }
         }
 
-        public bool Update(Message userChanges)
+        public Task Update(MessageDTO userChanges)
         {
             throw new NotImplementedException();
         }
 
-        public bool Delete(string MessageId)
+        public Task Delete(string MessageId)
         {
             throw new NotImplementedException();
         }

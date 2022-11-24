@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using ZaloOA_v2.Controllers;
 using ZaloOA_v2.Helpers;
+using ZaloOA_v2.Models.DAO;
 using ZaloOA_v2.Models.DTO;
 
 namespace ZaloOA_v2.Models.BussinessProcesses.DatabaseProcesses

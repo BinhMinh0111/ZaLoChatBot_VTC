@@ -4,11 +4,11 @@ namespace ZaloOA_v2.Repositories.Interfaces
 {
     public interface INoticesRepository
     {
-        Notice GetNotice(long NoticeId);
-        List<Notice> GetAllNotices();
-        List<Notice> GetPageNotices(int offset, int range, string? condition);
-        bool Add(Notice notice);
-        bool Update(Notice noticeChanges);
-        bool Delete(long NoticeId);
+        NoticeDTO GetNotice(long NoticeId);
+        List<NoticeDTO> GetAllNotices();
+        List<NoticeDTO> GetPageNotices(int offset, int range, string? condition);
+        Task Add(NoticeDTO notice);
+        Task Update(NoticeDTO noticeChanges);
+        Task Delete(long NoticeId);
     }
 }

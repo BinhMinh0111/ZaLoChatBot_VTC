@@ -1,44 +1,41 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System.Net;
+using System.Security.Policy;
 using ZaloOA_v2.Helpers;
 using ZaloOA_v2.Models;
 
-namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Workflow
+namespace ZaloOA_v2.API
 {
     [Route("api/[controller]")]
     [ApiController]
     public class SendMessageController : ControllerBase
     {
         [HttpPost]
-        public Task SendMessageToUser(long user_id, string text)
+        public Task<string> SendMessageToUser(long user_id, string text)
         {
-            try
+            string method = "POST";
+            var url = "https://openapi.zalo.me/v2.0/oa/message";
+            string aToken = DataHelper.GetToken();
+            var data = new
             {
-                string method = "POST";
-                var url = "https://openapi.zalo.me/v2.0/oa/message";
-                string aToken = DataHelper.GetToken();
-                var data = new
+                recipient = new Messages.Recipient
                 {
-                    recipient = new Messages.Recipient
-                    {
-                        user_id = user_id
-                    },
-                    message = new Messages.Message
-                    {
-                        text = text
-                    }
-                };
-                HttpStatusCode StatusCode;
-                HttpHelper.CallAuthJson(url, null, data, aToken, out StatusCode, method, 120000, "access_token");
-                return Task.CompletedTask;
-            }
-            catch (Exception ex)
+                    user_id = user_id
+                },
+                message = new Messages.Message
+                {
+                    text = text
+                }
+            };
+            HttpStatusCode StatusCode;
+            //string response = HttpHelper.CallAuthJson(url, null, data, aToken, out StatusCode, method, 120000, "access_token");
+            return Task.Run(() =>
             {
-                string error = string.Format("API:SendMessage:SendMessageToUser \n {0}", ex.Message);
-                LogWriter.LogWrite(error);
-                return Task.CompletedTask;
-            }
+                string response = HttpHelper.CallAuthJson(url, null, data, aToken, out StatusCode, method, 120000, "access_token");
+                return response;
+            });
         }
 
         //Get messages of specific user

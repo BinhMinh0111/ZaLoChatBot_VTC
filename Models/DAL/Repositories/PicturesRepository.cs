@@ -15,22 +15,22 @@ namespace ZaloOA_v2.Repositories
             throw new NotImplementedException();
         }
 
-        public List<Picture> GetAllPictures()
+        public List<PictureDTO> GetAllPictures()
         {
             throw new NotImplementedException();
         }
 
-        public List<Picture> GetPagePictures(int offset, int range)
+        public List<PictureDTO> GetPagePictures(int offset, int range)
         {
             throw new NotImplementedException();
         }
 
-        public Picture GetPictures(int PictureId)
+        public PictureDTO GetPictures(int PictureId)
         {
             throw new NotImplementedException();
         }
 
-        public bool Update(Picture pictureChanges)
+        public bool Update(PictureDTO pictureChanges)
         {
             throw new NotImplementedException();
         }

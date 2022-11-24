@@ -1,6 +1,6 @@
 ﻿namespace ZaloOA_v2.Models.DTO
 {
-    public class Notice
+    public class NoticeDTO
     {
         public long NoticeId { get; set; }
         public DateTime? NoticeDate { get; set; }

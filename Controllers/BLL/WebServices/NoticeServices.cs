@@ -15,11 +15,28 @@ namespace ZaloOA_v2.Controllers.BLL.WebServices
             this.noticesRepository = noticesRepository;
         }
 
-        public void AddNewNotice(string text)
+        public async Task<Int32> AddNewNotice(string text, int num)
         {
             Int32 unixTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-            
+            DateTime noticeTime = DateTime.Now;
+            int noticeNum = num;
+            string content = text;
 
+            var cancelToken = new CancellationTokenSource(3000).Token;
+            await Task.Run(() => 
+            {
+                NoticeDTO notice = new NoticeDTO
+                {
+                    NoticeId = unixTimestamp,
+                    NoticeDate = noticeTime,
+                    NumNotice = noticeNum,
+                    ContentUrl = content
+                };
+                noticesRepository.Add(notice);
+                cancelToken.ThrowIfCancellationRequested();
+            }, cancelToken);
+
+            return unixTimestamp;
         }
         public List<NoticeViewModel> NoticesByYear(int year)
         {

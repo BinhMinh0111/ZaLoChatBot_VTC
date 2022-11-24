@@ -1,6 +1,6 @@
 ﻿namespace ZaloOA_v2.Models.DTO
 {
-    public class Picture
+    public class PictureDTO
     {
         public int PictureId { get; set; }
         public long? UserId { get; set; }

@@ -3,6 +3,9 @@ using ZaloOA_v2.Helpers;
 using ZaloOA_v2.Models.DTO;
 using ZaloOA_v2.Repositories.Interfaces;
 using ZaloOA_v2.Models.ServiceModels;
+using System.Net.Http.Headers;
+using System.Linq;
+using ZaloOA_v2.Models.DAO;
 
 namespace ZaloOA_v2.DAA
 {
@@ -14,9 +17,9 @@ namespace ZaloOA_v2.DAA
         {
             this.context = context;
         }
-        public User GetUser(long userID)
+        public UserDTO GetUser(long userID)
         {
-            User returnUser = new User();
+            UserDTO returnUser = new UserDTO();
             try
             {
                 using (context)
@@ -43,13 +46,13 @@ namespace ZaloOA_v2.DAA
             return returnUser;
         }
 
-        public List<User> GetAllUsers()
+        public List<UserDTO> GetAllUsers()
         {           
-            var users = context.OaUsers.ToList();
-            List<User> returnList = new List<User>();
+            var users = context.OaUsers.Where(user => user.UserState == true).ToList();
+            List<UserDTO> returnList = new List<UserDTO>();
             foreach(var user in users)
             {
-                User _user = new User
+                UserDTO _user = new UserDTO
                 {
                     UserId = user.UserId,
                     IdByApp = user.IdByApp,
@@ -61,10 +64,16 @@ namespace ZaloOA_v2.DAA
             }
             return returnList;
         }
-
-        public List<User> GetPageUsers(int offset, int range)
+        
+        public int UsersTotal()
         {
-            List<User> userList = new List<User>();
+            int total = context.OaUsers.Where(user => user.UserState == true).Count();
+            return total;
+        }
+
+        public List<UserDTO> GetPageUsers(int offset, int range)
+        {
+            List<UserDTO> userList = new List<UserDTO>();
             using (context)
             {
                 try
@@ -72,7 +81,7 @@ namespace ZaloOA_v2.DAA
                     var users = context.OaUsers.Skip(offset).Take(range);
                     foreach (var user in users)
                     {
-                        User oaUser = new User
+                        UserDTO oaUser = new UserDTO
                         {
                             UserId = user.UserId,
                             IdByApp = user.IdByApp,

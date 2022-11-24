@@ -17,6 +17,16 @@ namespace ZaloOA_v2.Helpers
 
             return (eventName, timeStamp);
         }
+        //dynamic object hanlde Message responses
+        public static (string? message_id, int? error, string? message) MessageResponse (string jsonString)
+        {
+            var dynamicObject = JsonConvert.DeserializeObject<dynamic>(jsonString)!;
+
+            var messId = dynamicObject.data.message_id;
+            var err = dynamicObject.error;
+            var mess = dynamicObject.message;
+            return (messId, err, mess);
+        }
         //dynamic object hanlde User Messages
         public static (string? id, string? text, string? timeStamp, string msg_id) UserText(string jsonString)
         {

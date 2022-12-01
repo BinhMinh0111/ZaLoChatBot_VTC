@@ -1,7 +1,7 @@
 ﻿using ZaloOA_v2.Helpers;
-using ZaloOA_v2.Models.BussinessProcesses.DatabaseProcesses;
-using ZaloOA_v2.Processes;
-using ZaloOA_v2.Repositories.Interfaces;
+using ZaloOA_v2.Models.DAL.IRepository;
+using ZaloOA_v2.Models.DAL.Repositories;
+using ZaloOA_v2.Models.DTO;
 
 namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Components
 {
@@ -12,53 +12,36 @@ namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Components
         {
             this.usersRepository = usersRepository;
         }
-        public Task Process(string json, string eventName)
-        {
-            var followHolder = ObjectsHelper.UserFollow(json);
-            long user_id = long.Parse(followHolder.id);
-            Procedures exist = new Procedures();
-            if (!exist.UserExist(user_id) && eventName == "follow")
-            {
-                DbProcess.AddNewUser(user_id);
-                return Task.CompletedTask;
-            }
-
-            if (eventName == "follow")
-            {
-                if (!isFollowing(user_id))
-                {
-                    Procedures procedures = new Procedures();
-                    usersRepository.Restore(user_id);
-                    return Task.CompletedTask;
-                }
-                else
-                {
-                    string error = string.Format("Processes:OaFollowProcess:Process \n User already exist & state already following");
-                    LogWriter.LogWrite(error);
-                    return Task.CompletedTask;
-                }
-            }
-            else //unfollow
-            {
-                if (isFollowing(user_id))
-                {
-                    Procedures procedures = new Procedures();
-                    usersRepository.Delete(user_id);
-                    return Task.CompletedTask;
-                }
-                else
-                {
-                    string error = string.Format("Processes:OaFollowProcess:Process \n User already exist & state already unfollowing");
-                    LogWriter.LogWrite(error);
-                    return Task.CompletedTask;
-                }
-            }
-        }
-        private bool isFollowing(long user_id)
+        public async Task UserFollow(string json)
         {
             Procedures procedures = new Procedures();
-            bool returnValue = procedures.GetUserState(user_id);
-            return returnValue;
+            var holder = ObjectsHelper.UserFollow(json);
+            if (!procedures.UserExist(Int32.Parse(holder.id)))
+            {
+                await usersRepository.Add(Int32.Parse(holder.id));
+            }
+            else
+            {
+                UserDTO user = await usersRepository.GetUser(Int32.Parse(holder.id));
+                user.UserState = true;
+                await usersRepository.Update(user);
+            }
+        }
+
+        public async Task UserUnfollow(string json)
+        {
+            Procedures procedures = new Procedures();
+            var holder = ObjectsHelper.UserFollow(json);
+            if (!procedures.UserExist(Int32.Parse(holder.id)))
+            {
+                await usersRepository.Add(Int32.Parse(holder.id));
+            }
+            else
+            {
+                UserDTO user = await usersRepository.GetUser(Int32.Parse(holder.id));
+                user.UserState = false;
+                await usersRepository.Update(user);
+            }
         }
     }
 }

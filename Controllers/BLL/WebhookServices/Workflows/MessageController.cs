@@ -8,7 +8,6 @@ using ZaloOA_v2.API;
 using ZaloOA_v2.Helpers;
 using ZaloOA_v2.Models;
 using ZaloOA_v2.Models.DTO;
-using ZaloOA_v2.Models.ServiceModels;
 
 namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Workflows
 {

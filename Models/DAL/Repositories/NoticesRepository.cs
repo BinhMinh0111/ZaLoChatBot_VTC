@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks.Sources;
 using ZaloOA_v2.Helpers;
+using ZaloOA_v2.Models.DAL.IRepository;
 using ZaloOA_v2.Models.DAO;
 using ZaloOA_v2.Models.DTO;
-using ZaloOA_v2.Repositories.Interfaces;
 
-namespace ZaloOA_v2.DAA
+namespace ZaloOA_v2.Models.DAL.Repositories
 {
     public class NoticesRepository : INoticesRepository
     {
@@ -31,7 +31,7 @@ namespace ZaloOA_v2.DAA
                             returnNotice.NoticeDate = notice.NoticeDate;
                             returnNotice.NumNotice = notice.NumNotice;
                             returnNotice.ContentUrl = notice.ContentUrl;
-                        }    
+                        }
                     }
                 }
             }
@@ -45,7 +45,7 @@ namespace ZaloOA_v2.DAA
 
         public List<NoticeDTO> GetAllNotices()
         {
-            List<NoticeDTO> returnNotice = new List<NoticeDTO> ();
+            List<NoticeDTO> returnNotice = new List<NoticeDTO>();
             try
             {
                 using (context)
@@ -81,22 +81,19 @@ namespace ZaloOA_v2.DAA
         {
             try
             {
-                //await using (context)
-                //{
-                    var OANotice = new OaNotice
-                    {
-                        NoticeId = notice.NoticeId,
-                        NoticeDate = notice.NoticeDate,
-                        NumNotice = notice.NumNotice,
-                        ContentUrl = notice.ContentUrl,
-                    };
-                    context.OaNotices.Add(OANotice);
-                    context.SaveChanges();
-                //}
+                var OANotice = new OaNotice
+                {
+                    NoticeId = notice.NoticeId,
+                    NoticeDate = notice.NoticeDate,
+                    NumNotice = notice.NumNotice,
+                    ContentUrl = notice.ContentUrl,
+                };
+                context.OaNotices.Add(OANotice);
+                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                string error = string.Format("BussinessProcesses:DatabaseProcess:DAO:PostUser \n {0}", ex.Message);
+                string error = string.Format("Repositories:NoticesRepository:Add \n {0}", ex.Message);
                 LogWriter.LogWrite(error);
             }
         }

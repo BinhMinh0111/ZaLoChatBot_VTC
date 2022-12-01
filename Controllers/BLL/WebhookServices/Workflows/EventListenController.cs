@@ -9,7 +9,8 @@ using System.Configuration;
 using System.Diagnostics;
 using ZaloOA_v2.Models.DTO;
 using ZaloOA_v2.Controllers.BLL.WebhookServices.Components;
-using ZaloOA_v2.Repositories.Interfaces;
+using ZaloOA_v2.Models.DAL.IRepository;
+using ZaloOA_v2.Controllers.BLL.WebServices;
 
 namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Workflows
 {
@@ -29,7 +30,7 @@ namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Workflows
             this.messagesRepository = messagesRepository;
         }
 
-        public void Run(string json)
+        public async void Run(string json)
         {
             //Read and process events
             var eventHolder = ObjectsHelper.Events(json);
@@ -37,7 +38,7 @@ namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Workflows
             PictureServices pictureProcess = new PictureServices();
             OaServices oaProcess = new OaServices();
             OaFollowServices followProcess = new OaFollowServices(usersRepository);
-            ReceivedServices received = new ReceivedServices();
+            ReceiverServices received = new ReceiverServices(messagesRepository);
 
             if (eventHolder.event_name == "user_send_text")
             {
@@ -67,30 +68,41 @@ namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Workflows
                     cancelToken.ThrowIfCancellationRequested();
                 }, cancelToken);
             }
-            else if (eventHolder.event_name == "follow" || eventHolder.event_name == "unfollow")
+            else if (eventHolder.event_name == "follow")
             {
                 var cancelToken = new CancellationTokenSource(10000).Token;
-                Task.Run(() =>
+                Task.Run(async() =>
                 {
-                    followProcess.Process(json, eventHolder.event_name);
+                    await followProcess.UserFollow(json);
                     cancelToken.ThrowIfCancellationRequested();
                 }, cancelToken);
             }
-            else if (eventHolder.event_name == "user_received_message")
+            else if (eventHolder.event_name == "unfollow")
             {
                 var cancelToken = new CancellationTokenSource(10000).Token;
-                Task.Run(() =>
+                Task.Run(async() =>
                 {
-                    received.UserReceived(json);
+                    await followProcess.UserUnfollow(json);
+                    cancelToken.ThrowIfCancellationRequested();
+                }, cancelToken);
+            }    
+            else if (eventHolder.event_name == "user_received_message")
+            {
+                //Thread.Sleep(5000);
+                var cancelToken = new CancellationTokenSource(10000).Token;
+                await Task.Run(async() =>
+                {                   
+                    await received.UserReceived(json);
                     cancelToken.ThrowIfCancellationRequested();
                 }, cancelToken);
             }
             else if (eventHolder.event_name == "user_seen_message")
             {
                 var cancelToken = new CancellationTokenSource(10000).Token;
-                Task.Run(() =>
+                await Task.Run(async() =>
                 {
-                    received.UserSeen(json);
+                    //await Task.Delay(3000);
+                    await received.UserSeen(json);
                     cancelToken.ThrowIfCancellationRequested();
                 }, cancelToken);
             }

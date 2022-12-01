@@ -4,7 +4,7 @@ using ZaloOA_v2.Helpers;
 using ZaloOA_v2.Models.DAO;
 using ZaloOA_v2.Models.DTO;
 
-namespace ZaloOA_v2.Models.BussinessProcesses.DatabaseProcesses
+namespace ZaloOA_v2.Models.DAL.Repositories
 {
     public class DbProcess
     {

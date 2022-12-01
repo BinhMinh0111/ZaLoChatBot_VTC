@@ -3,12 +3,9 @@ using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Options;
 using System.Configuration;
 using ZaloOA_v2.Controllers;
-using ZaloOA_v2.DAA;
-using ZaloOA_v2.DAO;
+using ZaloOA_v2.Models.DAL.IRepository;
+using ZaloOA_v2.Models.DAL.Repositories;
 using ZaloOA_v2.Models.DAO;
-using ZaloOA_v2.Models.Processes.Web;
-using ZaloOA_v2.Repositories;
-using ZaloOA_v2.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

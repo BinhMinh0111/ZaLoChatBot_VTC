@@ -2,12 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text;
-using ZaloOA_v2.Controllers.BLL.WebhookServices.Workflows;
 using ZaloOA_v2.Helpers;
 using ZaloOA_v2.Models;
-using ZaloOA_v2.Repositories.Interfaces;
+using ZaloOA_v2.Models.DAL.IRepository;
 
-namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Workflow
+namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Workflows
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -20,7 +19,7 @@ namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Workflow
 
         public string json = string.Empty;
 
-        public ListenerController(IUsersRepository usersRepository, IPicturesRepository picturesRepository, 
+        public ListenerController(IUsersRepository usersRepository, IPicturesRepository picturesRepository,
             INoticesRepository noticesRepository, IMessagesRepository messagesRepository)
         {
             this.usersRepository = usersRepository;
@@ -43,7 +42,7 @@ namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Workflow
                 var cancelToken = new CancellationTokenSource(20000).Token;
                 Task.Run(() =>
                 {
-                    EventListenController eventController = 
+                    EventListenController eventController =
                     new EventListenController(usersRepository, picturesRepository, noticesRepository, messagesRepository);
                     eventController.Run(json);
                     cancelToken.ThrowIfCancellationRequested();

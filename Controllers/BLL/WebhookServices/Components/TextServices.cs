@@ -1,7 +1,6 @@
 ﻿using ZaloOA_v2.Controllers;
 using ZaloOA_v2.Helpers;
-using ZaloOA_v2.Models.BussinessProcesses.DatabaseProcesses;
-using ZaloOA_v2.Processes;
+using ZaloOA_v2.Models.DAL.Repositories;
 
 namespace ZaloOA_v2.Controllers.BLL.WebhookServices.Components
 {

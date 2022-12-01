@@ -1,4 +1,4 @@
-﻿namespace ZaloOA_v2.Models.ServiceModels
+﻿namespace ZaloOA_v2.Models.DTO
 {
     public class UserDTO
     {

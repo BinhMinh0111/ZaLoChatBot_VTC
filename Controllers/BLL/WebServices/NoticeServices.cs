@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using ZaloOA_v2.Models.DAL.IRepository;
 using ZaloOA_v2.Models.DTO;
 using ZaloOA_v2.Models.ViewModels;
-using ZaloOA_v2.Repositories.Interfaces;
 
 namespace ZaloOA_v2.Controllers.BLL.WebServices
 {
@@ -23,7 +23,7 @@ namespace ZaloOA_v2.Controllers.BLL.WebServices
             string content = text;
 
             var cancelToken = new CancellationTokenSource(3000).Token;
-            await Task.Run(() => 
+            await Task.Run(async() => 
             {
                 NoticeDTO notice = new NoticeDTO
                 {
@@ -32,7 +32,7 @@ namespace ZaloOA_v2.Controllers.BLL.WebServices
                     NumNotice = noticeNum,
                     ContentUrl = content
                 };
-                noticesRepository.Add(notice);
+                await noticesRepository.Add(notice);
                 cancelToken.ThrowIfCancellationRequested();
             }, cancelToken);
 

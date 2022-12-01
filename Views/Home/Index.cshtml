@@ -39,7 +39,42 @@
     <input id="submit" type="submit" value="Gửi">
 }
 
-@using (Html.BeginForm("SendToUsers","Home",FormMethod.Post))
+@using (Html.BeginForm("NoticeReport", "Home", FormMethod.Post))
 {
-    <h2>Thống Kê Thông Báo Đã Gửi</h2>
+    <h2>Thống Kê Thông Báo Đã Gửi Đến Khách Hàng</h2>
+    <select>
+        <option>
+            Theo Ngày
+        </option>
+        <option>
+            Theo Tháng
+        </option>
+        <option>
+            Theo Năm
+        </option>
+    </select>
+    <h2>Thống Kê Thông Báo Khách Hàng Đã Nhận</h2>
+    <select>
+        <option>
+            Theo Ngày
+        </option>
+        <option>
+            Theo Tháng
+        </option>
+        <option>
+            Theo Năm
+        </option>
+    </select>
+    <h2>Thống Kê Thông Báo Lỗi Không Gửi Đến Khách Hàng</h2>
+    <select>
+        <option>
+            Theo Ngày
+        </option>
+        <option>
+            Theo Tháng
+        </option>
+        <option>
+            Theo Năm
+        </option>
+    </select>
 }

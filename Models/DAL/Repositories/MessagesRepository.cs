@@ -1,48 +1,68 @@
-﻿using ZaloOA_v2.Helpers;
+﻿using System.Data.SqlClient;
+using System.Threading.Channels;
+using ZaloOA_v2.Helpers;
+using ZaloOA_v2.Models.DAL.IRepository;
 using ZaloOA_v2.Models.DAO;
-using ZaloOA_v2.Models.ServiceModels;
-using ZaloOA_v2.Repositories.Interfaces;
+using ZaloOA_v2.Models.DTO;
+using static ZaloOA_v2.Models.Messages;
 
-namespace ZaloOA_v2.DAO
+namespace ZaloOA_v2.Models.DAL.Repositories
 {
     public class MessagesRepository : IMessagesRepository
     {
-        private readonly db_a8ebff_kenjenorContext context;
+        private db_a8ebff_kenjenorContext context;
 
         public MessagesRepository(db_a8ebff_kenjenorContext context)
         {
             this.context = context;
         }
-        public MessageDTO GetMessage(string MessageId)
+        public async Task<MessageDTO> GetMessage(string messageId)
         {
+            //db_a8ebff_kenjenorContext _context = new db_a8ebff_kenjenorContext();
             MessageDTO returnMessage = new MessageDTO();
-            try
-            {
-                using (context)
+                try
                 {
-                    var messages = context.OaMessages;
-                    foreach (var message in messages)
-                    {
-                        if (MessageId == message.MessageId)
-                        {
-                            returnMessage.MessageId = message.MessageId;
-                            returnMessage.NoticeId = message.NoticeId;
-                            returnMessage.UserId = message.UserId;
-                        }    
-                    }
+                    //using (_context)
+                    //{
+                        var messages = await context.OaMessages.Where(message => message.MessageId.Equals(messageId)).FirstAsync();
+                        returnMessage.MessageId = messages.MessageId;
+                        returnMessage.NoticeId = messages.NoticeId;
+                        returnMessage.UserId = messages.UserId;
+                    //}
                 }
-            }
-            catch (Exception ex)
-            {
-                string error = string.Format("Repositories:GUID:GetMessages \n {0}", ex.Message);
-                LogWriter.LogWrite(error);
-            }
+                catch (SqlException ex)
+                {
+                    string error = string.Format("Repositories:MessagesRepositoriy:GetMessage \n {0}", ex.Message);
+                    LogWriter.LogWrite(error);
+                }
             return returnMessage;
         }
 
         public List<MessageDTO> GetAllMessages()
         {
-            throw new NotImplementedException();
+            List<MessageDTO> returnMessage = new List<MessageDTO>();
+            try
+            {
+                    var messages = context.OaMessages.Where(message => message.Status == true).ToList();
+                    foreach (var message in messages)
+                    {
+                        MessageDTO mess = new MessageDTO
+                        {
+                            MessageId = message.MessageId,
+                            NoticeId = message.NoticeId,
+                            UserId = message.UserId,
+                            State = message.State,
+                            Status = message.Status
+                        };
+                        returnMessage.Add(mess);
+                    }
+            }
+            catch (SqlException ex)
+            {
+                string error = string.Format("Repositories:MessagesRepositoriy:GetAllMessages \n {0}", ex.Message);
+                LogWriter.LogWrite(error);
+            }
+            return returnMessage;
         }
 
         public List<MessageDTO> GetPageMessages(int offset, int range, string? conditions)
@@ -54,31 +74,60 @@ namespace ZaloOA_v2.DAO
         {
             try
             {
-                //await using (context)
-                //{
-                    var OaMessage = new OaMessage
-                    {
-                        MessageId = message.MessageId,
-                        NoticeId = message.NoticeId,
-                        UserId = message.UserId, 
-                        State = message.State,
-                        Status = message.Status
-                    };
-                    context.OaMessages.Add(OaMessage);
-                    context.SaveChanges();
+                var cancelToken = new CancellationTokenSource(2000).Token;
+                var oaMessage = new OaMessage
+                {
+                    MessageId = message.MessageId,
+                    NoticeId = message.NoticeId,
+                    UserId = message.UserId,
+                    State = message.State,
+                    Status = message.Status
+                };
+                await Task.Run(async () =>
+                {                    
+                    context.OaMessages.Add(oaMessage);
+                    await context.SaveChangesAsync();
                     Console.WriteLine("Saved message");
-                //}
+                    cancelToken.ThrowIfCancellationRequested();
+                }, cancelToken);
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 string error = string.Format("Model:Repositories:MessagesRepository:Add \n {0}", ex.Message);
                 LogWriter.LogWrite(error);
             }
         }
 
-        public Task Update(MessageDTO userChanges)
+        public async Task<bool> Update(MessageDTO changes)
         {
-            throw new NotImplementedException();
+            MessageDTO userChanges = new MessageDTO();
+            userChanges = changes;
+            try
+            {
+                //var messages = context.OaMessages.Where(message => message.MessageId == userChanges.MessageId).FirstOrDefault();
+                var cancelToken = new CancellationTokenSource(2000).Token;
+                await Task.Run(() =>
+                {
+                    OaMessage mess = new OaMessage
+                    {
+                        MessageId = userChanges.MessageId,
+                        NoticeId = userChanges.NoticeId,
+                        UserId = userChanges.UserId,
+                        State = userChanges.State,
+                        Status = userChanges.Status
+                    };
+                    context.OaMessages.Update(mess);
+                    context.SaveChangesAsync();
+                    cancelToken.ThrowIfCancellationRequested();
+                }, cancelToken);
+            }
+            catch (SqlException ex)
+            {
+                string error = string.Format("Repositories:MessageRepository:Update \n {0}", ex.Message);
+                LogWriter.LogWrite(error);
+                return false;
+            }
+            return true;
         }
 
         public Task Delete(string MessageId)

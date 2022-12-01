@@ -4,17 +4,14 @@ using System.Security.Policy;
 using ZaloOA_v2.Helpers;
 using ZaloOA_v2.Models.DTO;
 using ZaloOA_v2.Controllers.BLL.WebhookServices;
-using ZaloOA_v2.Processes;
-using ZaloOA_v2.DAO;
-using ZaloOA_v2.Models.ServiceModels;
-using ZaloOA_v2.Repositories.Interfaces;
 using ZaloOA_v2.Models.ViewModels;
 using System.Collections.Generic;
-using ZaloOA_v2.DAA;
 using ZaloOA_v2.Controllers.BLL.WebhookServices.Workflows;
 using System.Security.Cryptography;
+using ZaloOA_v2.Models.DAL.Repositories;
+using ZaloOA_v2.Models.DAL.IRepository;
 
-namespace ZaloOA_v2.Models.Processes.Web
+namespace ZaloOA_v2.Controllers.BLL.WebServices
 {
     public class MessagesServices
     {
@@ -26,7 +23,7 @@ namespace ZaloOA_v2.Models.Processes.Web
             this.usersRepository = usersRepository;
         }
 
-        public async Task GetUsersPage (int offset,int range)
+        public async Task GetUsersPage(int offset, int range)
         {
             Procedures procedures = new Procedures();
             List<MessageDTO> userList = new List<MessageDTO>();
@@ -34,7 +31,7 @@ namespace ZaloOA_v2.Models.Processes.Web
             var cancelToken = new CancellationTokenSource(3000).Token;
             await Task.Run(() =>
             {
-                userList = _messagesRepository.GetPageMessages(offset, range,null);
+                userList = _messagesRepository.GetPageMessages(offset, range, null);
                 cancelToken.ThrowIfCancellationRequested();
             }, cancelToken);
         }
@@ -55,8 +52,8 @@ namespace ZaloOA_v2.Models.Processes.Web
         {
             List<UsersViewModel> holder = new List<UsersViewModel>();
             holder = input;
-            List<UserDTO> userList =new List<UserDTO>();
-            foreach(UsersViewModel item in holder)
+            List<UserDTO> userList = new List<UserDTO>();
+            foreach (UsersViewModel item in holder)
             {
                 UserDTO user = new UserDTO
                 {
@@ -68,9 +65,9 @@ namespace ZaloOA_v2.Models.Processes.Web
             }
             return userList;
         }
-        public async Task SendMessUsers(List<UserDTO> userList, string message,Int32 notId)
+        public async Task SendMessUsers(List<UserDTO> userList, string message, int notId)
         {
-            Int32 noticeId = notId;
+            int noticeId = notId;
             Console.WriteLine("Start");
             foreach (var user in userList)
             {
@@ -90,18 +87,18 @@ namespace ZaloOA_v2.Models.Processes.Web
                     else
                     {
                         //Nếu không gửi thành công thì gắn timestamp làm Id, và lưu mã lỗi
-                        Int32 unixTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+                        int unixTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
                         await SaveMessage(unixTimestamp.ToString() + "_" + response[0], user.UserId, noticeId, 1, true);
                     };
 
                     cancelToken.ThrowIfCancellationRequested();
                 }, cancelToken);
-            }    
+            }
         }
-        public async Task SendMessAllUsers( string message, Int32 notId)
+        public async Task SendMessAllUsers(string message, int notId)
         {
-            Int32 noticeId = notId;
-            var users = usersRepository.GetAllUsers();
+            int noticeId = notId;
+            var users = await usersRepository.GetAllUsers();
             foreach (var user in users)
             {
                 Console.WriteLine(user.DisplayName);
@@ -115,13 +112,14 @@ namespace ZaloOA_v2.Models.Processes.Web
                     //[0] error, [1] message, [2] messageId
                     if (int.Parse(response[0]) == 0)
                     {
-                        await SaveMessage(response[2],user.UserId,noticeId,1,true);
+                        await SaveMessage(response[2], user.UserId, noticeId, 1, true);
                     }
-                    else 
+                    else
                     {
                         //Nếu không gửi thành công thì gắn timestamp làm Id, và lưu mã lỗi
-                        Int32 unixTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-                        await SaveMessage(unixTimestamp.ToString() + "_" + response[0], user.UserId, noticeId, 1, true);
+                        int unixTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+                        await SaveMessage(unixTimestamp.ToString() + "_" + response[0], user.UserId, noticeId, 1, false);
+                        LogWriter.LogWrite("Failed sending to user: " + user.UserId + " at: " + unixTimestamp.ToString());
                     };
 
                     cancelToken.ThrowIfCancellationRequested();
@@ -129,13 +127,13 @@ namespace ZaloOA_v2.Models.Processes.Web
             }
         }
 
-        //Message State: 1 = sent, 2 = received, 3 = seen
-        public async Task SaveMessage (string? messId,long uId,Int32 notId,short state, bool status = true)
+        //Message State: 0 = unsent, 1 = sent, 2 = received, 3 = seen
+        public async Task SaveMessage(string? messId, long uId, int notId, short state, bool status = true)
         {
             string? messageId = messId;
             long userId = uId;
-            Int32 noticeId = notId;
-            short messageState = state; 
+            int noticeId = notId;
+            short messageState = state;
             bool messageStatus = status;
 
             MessageDTO message = new MessageDTO
@@ -150,9 +148,9 @@ namespace ZaloOA_v2.Models.Processes.Web
             try
             {
                 var cancelToken = new CancellationTokenSource(3000).Token;
-                await Task.Run(async() =>
+                await Task.Run(async () =>
                 {
-                    await _messagesRepository.Add(message);                   
+                    await _messagesRepository.Add(message);
                     cancelToken.ThrowIfCancellationRequested();
                 }, cancelToken);
             }

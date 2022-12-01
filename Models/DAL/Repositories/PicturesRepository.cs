@@ -1,7 +1,7 @@
-﻿using ZaloOA_v2.Models.DTO;
-using ZaloOA_v2.Repositories.Interfaces;
+﻿using ZaloOA_v2.Models.DAL.IRepository;
+using ZaloOA_v2.Models.DTO;
 
-namespace ZaloOA_v2.Repositories
+namespace ZaloOA_v2.Models.DAL.Repositories
 {
     public class PicturesRepository : IPicturesRepository
     {

@@ -1,17 +1,17 @@
 ﻿using ZaloOA_v2.Models.DAO;
-using ZaloOA_v2.Models.ServiceModels;
+using ZaloOA_v2.Models.DTO;
 
-namespace ZaloOA_v2.Repositories.Interfaces
+namespace ZaloOA_v2.Models.DAL.IRepository
 {
     public interface IUsersRepository
     {
-        UserDTO GetUser(long userID);
-        List<UserDTO> GetAllUsers();
-        int UsersTotal();
-        List<UserDTO> GetPageUsers(int offset , int range);
-        bool Add(long userID);
-        bool Update(OaUser userChanges);
-        bool Delete (long userID);
-        bool Restore(long userID);
+        Task<UserDTO> GetUser(long userID);
+        Task<List<UserDTO>> GetAllUsers();
+        Task<int> UsersTotal();
+        List<UserDTO> GetPageUsers(int offset, int range);
+        Task Add(long userID);
+        Task Update(UserDTO userChanges);
+        Task Delete(long userID);
+        Task Restore(long userID);
     }
 }

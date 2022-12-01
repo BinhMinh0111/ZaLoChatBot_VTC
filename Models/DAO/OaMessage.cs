@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace ZaloOA_v2.Models.DAO
 {
+    //Message State: 0 = unsent, 1 = sent, 2 = received, 3 = seen
     public partial class OaMessage
     {
         public string MessageId { get; set; } = null!;

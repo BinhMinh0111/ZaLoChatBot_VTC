@@ -4,7 +4,7 @@ using ZaloOA_v2.Helpers;
 using ZaloOA_v2.Models.DAO;
 using ZaloOA_v2.Models.DTO;
 
-namespace ZaloOA_v2.Processes
+namespace ZaloOA_v2.Models.DAL.Repositories
 {
     public class Procedures
     {
@@ -61,12 +61,12 @@ namespace ZaloOA_v2.Processes
             }
             return displayName;
         }
-        public bool GetUserState (long userId)
+        public bool GetUserState(long userId)
         {
             bool returnValue = false;
-            using(var context = new db_a8ebff_kenjenorContext())
+            using (var context = new db_a8ebff_kenjenorContext())
             {
-                try 
+                try
                 {
                     var users = context.OaUsers;
                     foreach (var user in users)
@@ -75,12 +75,12 @@ namespace ZaloOA_v2.Processes
                             returnValue = (bool)user.UserState;
                     }
                 }
-                catch(SqlException ex)
+                catch (SqlException ex)
                 {
                     string error = string.Format("Processes:Procedures:GetUserState \n {0}", ex.Message);
                     LogWriter.LogWrite(error);
                 }
-            }    
+            }
             return returnValue;
         }
         //public void UpdateUserState(long userId, bool state)

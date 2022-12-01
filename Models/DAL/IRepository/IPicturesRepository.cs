@@ -1,6 +1,6 @@
 ﻿using ZaloOA_v2.Models.DTO;
 
-namespace ZaloOA_v2.Repositories.Interfaces
+namespace ZaloOA_v2.Models.DAL.IRepository
 {
     public interface IPicturesRepository
     {
